@@ -3,7 +3,6 @@
     <fullName>LMS_OpportunityName__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
     <description>Relates to the opportunity tied to this response.</description>
-    <externalId>false</externalId>
     <inlineHelpText>Relates to the opportunity tied to this response.</inlineHelpText>
     <label>Opportunity Name</label>
     <referenceTo>Opportunity</referenceTo>

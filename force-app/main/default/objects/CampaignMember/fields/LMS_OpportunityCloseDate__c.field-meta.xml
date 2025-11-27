@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>LMS_OpportunityCloseDate__c</fullName>
+    <formula>LMS_OpportunityName__r.CloseDate</formula>
+    <label>Opportunity Close Date</label>
+    <required>false</required>
+    <type>Date</type>
+</CustomField>

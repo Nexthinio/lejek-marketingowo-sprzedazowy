@@ -2,7 +2,6 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>LMS_ResponseStatus__c</fullName>
     <description>Signifies the current stage of the response in the funnel. If Active, mirrors Lead&apos;s or Contact&apos;s status.</description>
-    <externalId>false</externalId>
     <inlineHelpText>Signifies the current stage of the response in the funnel. If Active, mirrors Lead&apos;s or Contact&apos;s status.</inlineHelpText>
     <label>Response Status</label>
     <required>false</required>

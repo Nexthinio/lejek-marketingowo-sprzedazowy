@@ -3,7 +3,6 @@
     <fullName>LMS_SQL__c</fullName>
     <defaultValue>false</defaultValue>
     <description>Signifies that the lead/contact has been qualified by the Sales team, triggered by the &apos;Qualified&apos; status.</description>
-    <externalId>false</externalId>
     <inlineHelpText>Signifies that the lead/contact has been qualified by the Sales team, triggered by the &apos;Qualified&apos; status.</inlineHelpText>
     <label>SQL</label>
     <type>Checkbox</type>

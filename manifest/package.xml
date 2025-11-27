@@ -1,10 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
-
+    <types>
+        <members>Campaign.LMS_BypassNurtureTimeout__c</members>
+        <members>Campaign.LMS_CampaignScore__c</members>
+        <members>CampaignMember.LMS_CurrentStageInFunnel__c</members>
+        <members>CampaignMember.LMS_InquiryDate__c</members>
+        <members>CampaignMember.LMS_Inquiry__c</members>
+        <members>CampaignMember.LMS_InquirytoMQL__c</members>
+        <members>CampaignMember.LMS_MQLDate__c</members>
+        <members>CampaignMember.LMS_MQL__c</members>
+        <members>CampaignMember.LMS_MQLtoSAL__c</members>
+        <members>CampaignMember.LMS_OpportunityAmount__c</members>
+        <members>CampaignMember.LMS_OpportunityCloseDate__c</members>
+        <members>CampaignMember.LMS_OpportunityCreateDate__c</members>
+        <members>CampaignMember.LMS_OpportunityName__c</members>
+        <members>CampaignMember.LMS_OpportunityStage__c</members>
+        <members>CampaignMember.LMS_OpportunityType__c</members>
+        <members>CampaignMember.LMS_ResponseDate__c</members>
+        <members>CampaignMember.LMS_ResponseStatus__c</members>
+        <members>CampaignMember.LMS_SALDate__c</members>
+        <members>CampaignMember.LMS_SAL__c</members>
+        <members>CampaignMember.LMS_SALtoSQL__c</members>
+        <members>CampaignMember.LMS_SQLDate__c</members>
+        <members>CampaignMember.LMS_SQL__c</members>
+        <members>CampaignMember.LMS_SQLtoSQO__c</members>
+        <members>CampaignMember.LMS_SQODate__c</members>
+        <members>CampaignMember.LMS_SQO__c</members>
+        <members>CampaignMember.LMS_SQOtoWon__c</members>
+        <members>CampaignMember.LMS_StillInInquiry__c</members>
+        <members>CampaignMember.LMS_StillInMQL__c</members>
+        <members>CampaignMember.LMS_StillInSAL__c</members>
+        <members>CampaignMember.LMS_StillInSQL__c</members>
+        <members>CampaignMember.LMS_StillInSQO__c</members>
+        <members>CampaignMember.LMS_WonDate__c</members>
+        <members>CampaignMember.LMS_Won__c</members>
+        <members>Contact.LMS_ContactStatus__c</members>
+        <members>Contact.LMS_FunnelScore__c</members>
+        <members>Contact.LMS_MarketoScore__c</members>
+        <members>Contact.LMS_NurtureTimeout__c</members>
+        <members>Lead.LMS_FunnelScore__c</members>
+        <members>Lead.LMS_MarketoScore__c</members>
+        <members>Lead.LMS_NurtureTimeout__c</members>
+        <members>Opportunity.LMS_FunnelContact__c</members>
+        <members>Opportunity.LMS_ResponseID__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>Contact_Record_Page</members>
+        <name>FlexiPage</name>
+    </types>
+    <types>
+        <members>Campaign-LMS Campaign Layout</members>
+        <members>CampaignMember-LMS Campaign Member Layout</members>
+        <members>Contact-LMS Contact Layout</members>
+        <members>Lead-LMS Lead Layout</members>
+        <members>Opportunity-LMS Opportunity Layout</members>
+        <name>Layout</name>
+    </types>
     <types>
         <members>LMS_Permissions_to_all_fields</members>
         <name>PermissionSet</name>
     </types>
-
-    <version>57.0</version>
+    <types>
+        <members>Contact.LMS_NewOpportunityButton</members>
+        <name>QuickAction</name>
+    </types>
+    <version>65.0</version>
 </Package>

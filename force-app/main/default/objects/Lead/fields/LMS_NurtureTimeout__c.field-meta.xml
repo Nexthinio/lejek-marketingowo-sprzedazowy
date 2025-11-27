@@ -2,7 +2,6 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>LMS_NurtureTimeout__c</fullName>
     <description>Defines the date to which the Lead cannot MQL.</description>
-    <externalId>false</externalId>
     <inlineHelpText>Defines the date to which the Lead cannot MQL.</inlineHelpText>
     <label>Nurture Timeout</label>
     <required>false</required>

@@ -3,7 +3,6 @@
     <fullName>LMS_BypassNurtureTimeout__c</fullName>
     <defaultValue>false</defaultValue>
     <description>Allows this campaign to bypass lead&apos;s or contact&apos;s Nurture Timeout.</description>
-    <externalId>false</externalId>
     <inlineHelpText>Allows this campaign to bypass lead&apos;s or contact&apos;s Nurture Timeout.</inlineHelpText>
     <label>Bypass Nurture Timeout</label>
     <type>Checkbox</type>

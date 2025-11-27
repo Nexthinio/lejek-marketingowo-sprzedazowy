@@ -2,7 +2,6 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>LMS_ResponseDate__c</fullName>
     <description>If the CampaignMember is a Response, this is the date when it that happened. This decides if a CM is a response or not.</description>
-    <externalId>false</externalId>
     <inlineHelpText>If the CampaignMember is a Response, this is the date when it that happened. This decides if a CM is a response or not.</inlineHelpText>
     <label>Response Date</label>
     <required>false</required>

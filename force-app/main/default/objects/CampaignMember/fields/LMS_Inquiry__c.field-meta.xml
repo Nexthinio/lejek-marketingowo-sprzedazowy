@@ -3,7 +3,6 @@
     <fullName>LMS_Inquiry__c</fullName>
     <defaultValue>false</defaultValue>
     <description>Any response on the related lead/contact.</description>
-    <externalId>false</externalId>
     <inlineHelpText>Any response on the related lead/contact.</inlineHelpText>
     <label>Inquiry</label>
     <type>Checkbox</type>

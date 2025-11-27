@@ -3,7 +3,6 @@
     <fullName>LMS_MQL__c</fullName>
     <defaultValue>false</defaultValue>
     <description>Response that was qualified.</description>
-    <externalId>false</externalId>
     <inlineHelpText>Response that was qualified.</inlineHelpText>
     <label>MQL</label>
     <type>Checkbox</type>

@@ -3,7 +3,6 @@
     <fullName>LMS_FunnelContact__c</fullName>
     <deleteConstraint>SetNull</deleteConstraint>
     <description>Links to the contact from which this opportunity has been created.</description>
-    <externalId>false</externalId>
     <inlineHelpText>Links to the contact from which this opportunity has been created.</inlineHelpText>
     <label>Funnel Contact</label>
     <referenceTo>Contact</referenceTo>

@@ -3,7 +3,6 @@
     <fullName>LMS_SQO__c</fullName>
     <defaultValue>false</defaultValue>
     <description>An opportunity is created on the related contact.</description>
-    <externalId>false</externalId>
     <inlineHelpText>An opportunity is created on the related contact.</inlineHelpText>
     <label>SQO</label>
     <type>Checkbox</type>
