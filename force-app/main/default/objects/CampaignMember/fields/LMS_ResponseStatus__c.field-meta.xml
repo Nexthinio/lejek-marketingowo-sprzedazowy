@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>LMS_ResponseStatus__c</fullName>
+    <description>Signifies the current stage of the response in the funnel. If Active, mirrors Lead&apos;s or Contact&apos;s status.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Signifies the current stage of the response in the funnel. If Active, mirrors Lead&apos;s or Contact&apos;s status.</inlineHelpText>
+    <label>Response Status</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Resolved - Not Qualified</fullName>
+                <default>false</default>
+                <label>Resolved - Not Qualified</label>
+            </value>
+            <value>
+                <fullName>Resolved - Already In Funnel</fullName>
+                <default>false</default>
+                <label>Resolved - Already In Funnel</label>
+            </value>
+            <value>
+                <fullName>Resolved - Opportunity Deleted</fullName>
+                <default>false</default>
+                <label>Resolved - Opportunity Deleted</label>
+            </value>
+            <value>
+                <fullName>Resolved - Opportunity Won</fullName>
+                <default>false</default>
+                <label>Resolved - Opportunity Won</label>
+            </value>
+            <value>
+                <fullName>Resolved - Opportunity Lost</fullName>
+                <default>false</default>
+                <label>Resolved - Opportunity Lost</label>
+            </value>
+            <value>
+                <fullName>Working</fullName>
+                <default>false</default>
+                <label>Working</label>
+            </value>
+            <value>
+                <fullName>Attempted Contact</fullName>
+                <default>false</default>
+                <label>Attempted Contact</label>
+            </value>
+            <value>
+                <fullName>Qualified</fullName>
+                <default>false</default>
+                <label>Qualified</label>
+            </value>
+            <value>
+                <fullName>Active Opportunity</fullName>
+                <default>false</default>
+                <label>Active Opportunity</label>
+            </value>
+            <value>
+                <fullName>Nurture</fullName>
+                <default>false</default>
+                <label>Nurture</label>
+            </value>
+            <value>
+                <fullName>Not a Response</fullName>
+                <default>false</default>
+                <label>Not a Response</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>LMS_SALtoSQL__c</fullName>
+    <description>The number of days in between the SAL and SQL stages.</description>
+    <externalId>false</externalId>
+    <formula>LMS_SQLDate__c - LMS_SALDate__c</formula>
+    <inlineHelpText>The number of days in between the SAL and SQL stages.</inlineHelpText>
+    <label>SAL to SQL</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

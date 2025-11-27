@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>LMS_StillInMQL__c</fullName>
+    <description>Set to true if the response is currently in MQL stage.</description>
+    <externalId>false</externalId>
+    <formula>LMS_CurrentStageInFunnel__c = &quot;2. MQL&quot;</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <inlineHelpText>Set to true if the response is currently in MQL stage.</inlineHelpText>
+    <label>Still In MQL</label>
+    <type>Checkbox</type>
+</CustomField>

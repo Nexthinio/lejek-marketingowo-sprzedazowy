@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>LMS_MQL__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Response that was qualified.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Response that was qualified.</inlineHelpText>
+    <label>MQL</label>
+    <type>Checkbox</type>
+</CustomField>

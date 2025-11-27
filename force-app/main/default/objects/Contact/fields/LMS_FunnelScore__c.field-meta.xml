@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>LMS_FunnelScore__c</fullName>
+    <description>Defines the score for this contact. Can contain negative values.</description>
+    <externalId>false</externalId>
+    <formula>/* This formula field should be changed according to the company&apos;s scoring logic. */
+
+IF(ISBLANK(Email), -100, IF(LMS_MarketoScore__c &gt;= 40, 100, 0))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <inlineHelpText>Defines the score for this contact. Can contain negative values.</inlineHelpText>
+    <label>Funnel Score</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

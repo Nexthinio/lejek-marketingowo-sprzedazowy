@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>LMS_ResponseID__c</fullName>
+    <description>Stored the ID of the related response.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Stored the ID of the related response.</inlineHelpText>
+    <label>Response ID</label>
+    <length>20</length>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>
