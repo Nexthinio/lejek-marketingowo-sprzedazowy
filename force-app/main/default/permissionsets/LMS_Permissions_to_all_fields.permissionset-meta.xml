@@ -51,6 +51,11 @@
         <field>CampaignMember.LMS_OpportunityName__c</field>
         <readable>true</readable>
     </fieldPermissions>
+        <fieldPermissions>
+        <editable>false</editable>
+        <field>CampaignMember.LMS_ViewResponse__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
         <field>CampaignMember.LMS_ResponseDate__c</field>
