@@ -13,10 +13,6 @@ public with sharing class LMS_CampaignMemberSequence {
         'Working', 'Attempted Contact', 'Qualified', 'Active Opportunity'
     };
     
-    public static final String RESOLVEDALREADYACTIVE = 'Resolved - Already In Funnel';
-    public static final String RESOLVEDNOTATTHRESHOLD = 'Resolved - Not Qualified';
-    public static final String NOTARESPONSE = 'Not a Response';
-    
     // ======================================================
     //  ENTRY POINT
     // ======================================================
@@ -66,7 +62,7 @@ public with sharing class LMS_CampaignMemberSequence {
         System.debug('---LMS_CampaignMemberSequence: handleDelete---');
         
         Set<Id> contactIds = new Set<Id>();
-        Set<Id> leadIds    = new Set<Id>();
+        Set<Id> leadIds = new Set<Id>();
         
         for (CampaignMember cm : cmOldList) {
             if (ACTIVESTATUSLIST.contains(cm.LMS_ResponseStatus__c)) {
@@ -97,6 +93,7 @@ public with sharing class LMS_CampaignMemberSequence {
         
         List<CampaignMember> responded = detectResponses();
         if (responded.isEmpty()) return;
+        else LMS_FunnelSequence.setInquiry(responded);
         
         Set<Id> contactIds = extractContactIds(cmNewList);
         Set<Id> leadIds = extractLeadIds(cmNewList);
@@ -127,12 +124,9 @@ public with sharing class LMS_CampaignMemberSequence {
     private static List<CampaignMember> detectResponses() {
         
         List<CampaignMember> responded = new List<CampaignMember>();
+        List<CampaignMember> notResponded = new List<CampaignMember>();
         
         for (CampaignMember cm : cmNewList) {
-            
-            cm.LMS_ResponseDate__c = null;
-            cm.LMS_ResponseStatus__c = null;
-            
             List<String> respondedStatuses = new List<String>();
             for (CampaignMemberStatus cms : [
                 SELECT Label 
@@ -142,13 +136,10 @@ public with sharing class LMS_CampaignMemberSequence {
                 respondedStatuses.add(cms.Label);
             }
             
-            if (respondedStatuses.contains(cm.Status)) {
-                cm.LMS_Inquiry__c = true;
-                cm.LMS_InquiryDate__c = Date.today();
-                cm.LMS_ResponseDate__c = Date.today();
+            if (respondedStatuses.contains(cm.Status) || cm.LMS_ResponseDate__c != null) {
                 responded.add(cm);
             } else {
-                cm.LMS_ResponseStatus__c = NOTARESPONSE;
+                LMS_FunnelSequence.setResponseStatus(cm, LMS_FunnelSequence.NOTARESPONSE);
             }
         }
         return responded;
@@ -217,6 +208,7 @@ public with sharing class LMS_CampaignMemberSequence {
     // ======================================================
     
     private static void applyQualificationResults(Map<CampaignMember, Boolean> qualified, Map<Id, SObject> parents) {
+        List <CampaignMember> toUpdate = new List<CampaignMember>();
         
         for (CampaignMember cm : qualified.keySet()) {
             
@@ -236,7 +228,7 @@ public with sharing class LMS_CampaignMemberSequence {
             
             // Parent already active
             if (alreadyActive) {
-                cm.LMS_ResponseStatus__c = RESOLVEDALREADYACTIVE;
+                LMS_FunnelSequence.setResponseStatus(cm, LMS_FunnelSequence.RESOLVEDALREADYACTIVE);
                 continue;
             }
             
@@ -250,15 +242,15 @@ public with sharing class LMS_CampaignMemberSequence {
                         LMS_Configuration.FIRSTACTIVESTATUS;
                 }
                 
-                cm.LMS_ResponseStatus__c = LMS_Configuration.FIRSTACTIVESTATUS;
-                cm.LMS_MQL__c = true;
-                cm.LMS_MQLDate__c = Date.today();
+                LMS_FunnelSequence.setResponseStatus(cm, LMS_Configuration.FIRSTACTIVESTATUS);
+                toUpdate.add(cm);
             }
             // Not at threshold
             else {
-                cm.LMS_ResponseStatus__c = RESOLVEDNOTATTHRESHOLD;
+                LLMS_FunnelSequence.setResponseStatus(cm, LMS_Configuration.FIRSTACTIVESTATUS);
             }
         }
+        LMS_FunnelSequence.setMQL(toUpdate);
     }
     
     // ======================================================
@@ -277,12 +269,12 @@ public with sharing class LMS_CampaignMemberSequence {
             SObject parent = parents.get(cm.ContactId != null ? cm.ContactId : cm.LeadId);
             Campaign camp = campaigns.get(cm.CampaignId);
             
-            Integer parentScore   = LMS_Utils.toInt(parent.get('LMS_FunnelScore__c'));
+            Integer parentScore = LMS_Utils.toInt(parent.get('LMS_FunnelScore__c'));
             Integer campaignScore = LMS_Utils.toInt(camp.get('LMS_CampaignScore__c'));
-            Integer finalScore    = parentScore + campaignScore;
+            Integer finalScore = parentScore + campaignScore;
             
-            Boolean bypass  = (Boolean) camp.get('LMS_BypassNurtureTimeout__c');
-            Date timeout    = (Date) parent.get('LMS_NurtureTimeout__c');
+            Boolean bypass = (Boolean) camp.get('LMS_BypassNurtureTimeout__c');
+            Date timeout = (Date) parent.get('LMS_NurtureTimeout__c');
             Boolean expired = (timeout == null || timeout < Date.today());
             
             if (finalScore >= LMS_Configuration.getScoreThreshold() &&
