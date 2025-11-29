@@ -9,10 +9,6 @@ public with sharing class LMS_CampaignMemberSequence {
     public static List<CampaignMember> cmNewList { get; protected set; }
     public static Map<Id, CampaignMember> cmNewMap { get; protected set; }
     
-    public static final List<String> ACTIVESTATUSLIST = new List<String>{
-        'Working', 'Attempted Contact', 'Qualified', 'Active Opportunity'
-    };
-    
     // ======================================================
     //  ENTRY POINT
     // ======================================================
@@ -65,7 +61,7 @@ public with sharing class LMS_CampaignMemberSequence {
         Set<Id> leadIds = new Set<Id>();
         
         for (CampaignMember cm : cmOldList) {
-            if (ACTIVESTATUSLIST.contains(cm.LMS_ResponseStatus__c)) {
+            if (LMS_StatusManager.ACTIVESTATUSLIST.contains(cm.LMS_ResponseStatus__c)) {
                 if (cm.ContactId != null) contactIds.add(cm.ContactId);
                 else leadIds.add(cm.LeadId);
             }
@@ -75,9 +71,9 @@ public with sharing class LMS_CampaignMemberSequence {
         
         for (SObject sobj : parents.values()) {
             if (sobj.getSObjectType() == Contact.SObjectType) {
-                ((Contact)sobj).LMS_ContactStatus__c = LMS_Configuration.FIRSTSTATUS;
+                ((Contact)sobj).LMS_ContactStatus__c = LMS_StatusManager.NURTURESTATUS;
             } else {
-                ((Lead)sobj).Status = LMS_Configuration.FIRSTSTATUS;
+                ((Lead)sobj).Status = LMS_StatusManager.NURTURESTATUS;
             }
         }
         
@@ -124,7 +120,6 @@ public with sharing class LMS_CampaignMemberSequence {
     private static List<CampaignMember> detectResponses() {
         
         List<CampaignMember> responded = new List<CampaignMember>();
-        List<CampaignMember> notResponded = new List<CampaignMember>();
         
         for (CampaignMember cm : cmNewList) {
             List<String> respondedStatuses = new List<String>();
@@ -139,7 +134,7 @@ public with sharing class LMS_CampaignMemberSequence {
             if (respondedStatuses.contains(cm.Status) || cm.LMS_ResponseDate__c != null) {
                 responded.add(cm);
             } else {
-                LMS_FunnelSequence.setResponseStatus(cm, LMS_FunnelSequence.NOTARESPONSE);
+                LMS_FunnelSequence.setResponseStatus(cm, LMS_StatusManager.NOTARESPONSE);
             }
         }
         return responded;
@@ -219,16 +214,16 @@ public with sharing class LMS_CampaignMemberSequence {
             
             if (parent.getSObjectType() == Contact.SObjectType) {
                 Contact c = (Contact) parent;
-                alreadyActive = ACTIVESTATUSLIST.contains(c.LMS_ContactStatus__c);
+                alreadyActive = LMS_StatusManager.ACTIVESTATUSLIST.contains(c.LMS_ContactStatus__c);
             }
             else if (parent.getSObjectType() == Lead.SObjectType) {
                 Lead l = (Lead) parent;
-                alreadyActive = ACTIVESTATUSLIST.contains(l.Status);
+                alreadyActive = LMS_StatusManager.ACTIVESTATUSLIST.contains(l.Status);
             }
             
             // Parent already active
             if (alreadyActive) {
-                LMS_FunnelSequence.setResponseStatus(cm, LMS_FunnelSequence.RESOLVEDALREADYACTIVE);
+                LMS_FunnelSequence.setResponseStatus(cm, LMS_StatusManager.RESOLVEDALREADYACTIVE);
                 continue;
             }
             
@@ -236,18 +231,18 @@ public with sharing class LMS_CampaignMemberSequence {
             if (qualified.get(cm) == true) {
                 if (parent.getSObjectType() == Contact.SObjectType) {
                     ((Contact)parent).LMS_ContactStatus__c =
-                        LMS_Configuration.FIRSTACTIVESTATUS;
+                        LMS_StatusManager.FIRSTACTIVESTATUS;
                 } else {
                     ((Lead)parent).Status =
-                        LMS_Configuration.FIRSTACTIVESTATUS;
+                        LMS_StatusManager.FIRSTACTIVESTATUS;
                 }
                 
-                LMS_FunnelSequence.setResponseStatus(cm, LMS_Configuration.FIRSTACTIVESTATUS);
+                LMS_FunnelSequence.setResponseStatus(cm, LMS_StatusManager.FIRSTACTIVESTATUS);
                 toUpdate.add(cm);
             }
             // Not at threshold
             else {
-                LLMS_FunnelSequence.setResponseStatus(cm, LMS_Configuration.FIRSTACTIVESTATUS);
+                LMS_FunnelSequence.setResponseStatus(cm, LMS_StatusManager.RESOLVEDNOTATTHRESHOLD);
             }
         }
         LMS_FunnelSequence.setMQL(toUpdate);
