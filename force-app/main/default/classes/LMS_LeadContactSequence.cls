@@ -56,11 +56,15 @@ public with sharing class LMS_LeadContactSequence {
         System.debug('---LMS_LeadContactSequence: handleUpdate---');
         
         if(fromLeadConversion) {
-            System.debug('---LMS_LeadContactSequence: Pomijamy, żeby ominąć pętlę---');
+            /* To co miało zostać obsłużone podczas konwersji leadów zostało już obsłużone, nie musimy tego robić ponownie.
+            * Wchodzimy tu ponownie przez aktualizację statusu kontaktu
+            */
             return;
         }
         
-        LMS_LeadConvertSequence.startSequence(leadOldMap, leadNewList);
+        if(!isContact) {
+            LMS_LeadConvertSequence.startSequence(leadOldMap, leadNewList);
+        }
         
         Set<Id> contactIds = new Set<Id>();
         Set<Id> leadIds = new Set<Id>();
