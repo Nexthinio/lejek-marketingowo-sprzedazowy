@@ -19,6 +19,10 @@ public with sharing class LMS_LeadContactSequence {
      * @return void
      */
     
+    public static void setFromLeadConversion(Boolean value) {
+        fromLeadConversion = value;
+    }
+    
     public static void startSequence(Schema.sObjectType triggeringObject, LMS_TriggerCopy triggerCopy) {
         System.debug('---LMS_LeadContactSequence: Entered---');
         
@@ -37,17 +41,18 @@ public with sharing class LMS_LeadContactSequence {
         }
         
         if(triggerCopy.isUpdate) {
-            handleUpdate();
+            handleUpdate(triggerCopy);
         }
     }
     
     /**
      * Metoda obsługująca logikę przy aktualizacji Lead lub Contact.
      *
+     * @param triggerCopy Kopia triggera z danymi
      * @return void
      */
     
-    private static void handleUpdate() {
+    private static void handleUpdate(LMS_TriggerCopy triggerCopy) {
         System.debug('---LMS_LeadContactSequence: handleUpdate---');
         
         if(fromLeadConversion) {
@@ -55,7 +60,7 @@ public with sharing class LMS_LeadContactSequence {
             return;
         }
         
-        copyLeadStatusToContactOnConvert();
+        LMS_LeadConvertSequence.startSequence(leadOldMap, leadNewList);
         
         Set<Id> contactIds = new Set<Id>();
         Set<Id> leadIds = new Set<Id>();
@@ -135,38 +140,7 @@ public with sharing class LMS_LeadContactSequence {
     public static void copyLeadStatusToContactOnConvert() {
         System.debug('---LMS_LeadContactSequence: copyLeadStatusToContactOnConvert---');
         // Zbieramy leady, które właśnie są konwertowane
-        Map<Id, String> contactIdToLeadStatus = new Map<Id, String>();
         
-        for (Lead lNew : leadNewList) {
-            Lead lOld = leadOldMap.get(lNew.Id);
-            if (lOld == null) continue;
-            
-            System.debug('Stary, konwersja: ' + lOld.IsConverted + ', Nowy, konwersja: ' + lNew.IsConverted + ', ContactID, nowy: ' + lNew.ConvertedContactId);
-            
-            // wykrycie startu konwersji
-            if (!lOld.IsConverted && lNew.IsConverted && lNew.ConvertedContactId != null) {
-                String leadStatus = (String) lOld.get(LMS_StatusManager.LEADSTATUSFIELD);
-                if (leadStatus != null) {
-                    contactIdToLeadStatus.put(lNew.ConvertedContactId, leadStatus);
-                }
-            }
-        }
-        
-        if (contactIdToLeadStatus.isEmpty()) return;
-        
-        // Update kontaktów
-        List<Contact> toUpdate = new List<Contact>();
-        for (Id conId : contactIdToLeadStatus.keySet()) {
-            Contact c = new Contact(
-                Id = conId
-                );
-            c.put(LMS_StatusManager.CONTACTSTATUSFIELD, contactIdToLeadStatus.get(conId));
-            toUpdate.add(c);
-        }
-        
-        fromLeadConversion = true;
-        update toUpdate;
-        fromLeadConversion = false;
     }
     
 }
