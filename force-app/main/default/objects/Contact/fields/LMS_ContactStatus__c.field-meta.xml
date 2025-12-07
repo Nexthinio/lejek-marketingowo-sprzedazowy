@@ -22,9 +22,9 @@
                 <label>Working</label>
             </value>
             <value>
-                <fullName>Attempted Contact</fullName>
+                <fullName>Attempting Contact</fullName>
                 <default>false</default>
-                <label>Attempted Contact</label>
+                <label>Attempting Contact</label>
             </value>
             <value>
                 <fullName>Qualified</fullName>

@@ -1,4 +1,13 @@
 public with sharing class LMS_MainDispatcher {
+
+    /**
+     * Dispatcher główny aplikacji, który kieruje logikę do odpowiednich sekwencji na podstawie typu obiektu wywołującego.
+     *
+     * @param triggeringObject Typ obiektu wywołującego (Contact, Lead, Opportunity, CampaignMember)
+     * @param triggerCopy Kopia triggera z danymi
+     * @return void
+     */
+    
     public static void dispatch(Schema.sObjectType triggeringObject, LMS_TriggerCopy triggerCopy) {
         System.debug('---LMS_MainDispatcher: Entered---');
         System.debug(triggeringObject);
