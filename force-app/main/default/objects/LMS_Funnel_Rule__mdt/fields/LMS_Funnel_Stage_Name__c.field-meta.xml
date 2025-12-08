@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>LMS_Funnel_Stage_Name__c</fullName>
+    <caseSensitive>false</caseSensitive>
+    <description>This is the name of the funnel stage. 
+Related Checkbox field and Date field should match format LMS_&lt;funnel_stage_name&gt;__c and LMS_&lt;funnel_stage_name&gt;Date__c.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>This is the name of the funnel stage.</inlineHelpText>
+    <label>Funnel Stage Name</label>
+    <length>20</length>
+    <required>true</required>
+    <type>Text</type>
+    <unique>true</unique>
+</CustomField>

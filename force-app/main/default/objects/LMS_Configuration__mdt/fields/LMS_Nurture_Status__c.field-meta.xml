@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>LMS_Nurture_Status__c</fullName>
+    <defaultValue>&apos;Nurture&apos;</defaultValue>
+    <description>Defines the status to which the Leads/Contacts are set to after deleting an active CampaignMember or after closing related opportunity.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Defines the status to which the Leads/Contacts are set to after deleting an active CampaignMember or after closing related opportunity.</inlineHelpText>
+    <label>Nurture Status</label>
+    <length>20</length>
+    <required>true</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

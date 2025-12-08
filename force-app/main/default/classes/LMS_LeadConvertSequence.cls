@@ -20,7 +20,7 @@ public with sharing class LMS_LeadConvertSequence {
             
             // wykrycie startu konwersji
             if (!lOld.IsConverted && lNew.IsConverted && lNew.ConvertedContactId != null) {
-                String leadStatus = (String) lOld.get(LMS_StatusManager.LEADSTATUSFIELD);
+                String leadStatus = (String) lOld.get(LMS_StatusManager.getLeadStatusField());
                 if (leadStatus != null) {
                     contactIdToLeadStatus.put(lNew.ConvertedContactId, leadStatus);
                 }
@@ -35,7 +35,7 @@ public with sharing class LMS_LeadConvertSequence {
             Contact c = new Contact(
                 Id = conId
                 );
-            c.put(LMS_StatusManager.CONTACTSTATUSFIELD, contactIdToLeadStatus.get(conId));
+            c.put(LMS_StatusManager.getContactStatusField(), contactIdToLeadStatus.get(conId));
             toUpdate.add(c);
         }
         

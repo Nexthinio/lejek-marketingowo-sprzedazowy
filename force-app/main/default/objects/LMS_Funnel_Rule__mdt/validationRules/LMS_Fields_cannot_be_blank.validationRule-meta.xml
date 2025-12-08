@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>LMS_Fields_cannot_be_blank</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+OR(
+ISPICKVAL( LMS_Trigger__c , &apos;PARENTUPDATE&apos;), 
+ISPICKVAL( LMS_Trigger__c , &apos;OPPORTUNITYUPDATE&apos;)),
+OR(
+ISBLANK( LMS_Field_API_Name__c),
+ISBLANK( LMS_Expected_Value__c)
+))</errorConditionFormula>
+    <errorMessage>When selecting a criteria on update, you need to specify both the Field&apos;s API Name and expected value.</errorMessage>
+</ValidationRule>

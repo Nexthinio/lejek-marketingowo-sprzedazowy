@@ -57,8 +57,8 @@ public with sharing class LMS_LeadContactSequence {
         
         if(fromLeadConversion) {
             /* To co miało zostać obsłużone podczas konwersji leadów zostało już obsłużone, nie musimy tego robić ponownie.
-            * Wchodzimy tu ponownie przez aktualizację statusu kontaktu
-            */
+             * Wchodzimy tu ponownie przez aktualizację statusu kontaktu
+             */
             return;
         }
         
@@ -79,9 +79,8 @@ public with sharing class LMS_LeadContactSequence {
             }
         }
         
-        List<String> activeStatusList = LMS_StatusManager.ACTIVESTATUSLIST;
         String fields = LMS_DatabaseQueryHelper.getCMFieldsToQuery();
-        String whereClause = LMS_DatabaseQueryHelper.buildActiveCampaignMemberWhere(isContact, contactIds, leadIds, activeStatusList);
+        String whereClause = LMS_DatabaseQueryHelper.buildActiveCampaignMemberWhere(isContact, contactIds, leadIds);
         List<SObject> rows = LMS_DatabaseQueryHelper.runQueryList(fields, 'CampaignMember', whereClause);
         List<CampaignMember> activeCMs = (List<CampaignMember>) rows;
         
@@ -97,11 +96,11 @@ public with sharing class LMS_LeadContactSequence {
             for (Contact cNew : conNewList) {
                 Contact cOld = conOldMap.get(cNew.Id);
                 
-                String newStatus = (String)cNew.get(LMS_StatusManager.CONTACTSTATUSFIELD);
-                String oldStatus = (String)cOld.get(LMS_StatusManager.CONTACTSTATUSFIELD);
+                String newStatus = (String)cNew.get(LMS_StatusManager.getContactStatusField());
+                String oldStatus = (String)cOld.get(LMS_StatusManager.getContactStatusField());
                 
-                Boolean wasActive = LMS_StatusManager.ACTIVESTATUSLIST.contains(oldStatus);
-                Boolean isActiveNow = LMS_StatusManager.ACTIVESTATUSLIST.contains(newStatus);
+                Boolean wasActive = LMS_StatusManager.getActiveStatusList().contains(oldStatus);
+                Boolean isActiveNow = LMS_StatusManager.getActiveStatusList().contains(newStatus);
                 
                 if (wasActive && !isActiveNow) {
                     CampaignMember cm = cmByParentId.get(cNew.Id);
@@ -114,11 +113,11 @@ public with sharing class LMS_LeadContactSequence {
             for (Lead lNew : leadNewList) {
                 Lead lOld = leadOldMap.get(lNew.Id);
                 
-                String newStatus = (String)lNew.get(LMS_StatusManager.LEADSTATUSFIELD);
-                String oldStatus = (String)lOld.get(LMS_StatusManager.LEADSTATUSFIELD);
+                String newStatus = (String)lNew.get(LMS_StatusManager.getLeadStatusField());
+                String oldStatus = (String)lOld.get(LMS_StatusManager.getLeadStatusField());
                 
-                Boolean wasActive = LMS_StatusManager.ACTIVESTATUSLIST.contains(oldStatus);
-                Boolean isActiveNow = LMS_StatusManager.ACTIVESTATUSLIST.contains(newStatus);
+                Boolean wasActive = LMS_StatusManager.getActiveStatusList().contains(oldStatus);
+                Boolean isActiveNow = LMS_StatusManager.getActiveStatusList().contains(newStatus);
                 
                 if (wasActive && !isActiveNow) {
                     CampaignMember cm = cmByParentId.get(lNew.Id);

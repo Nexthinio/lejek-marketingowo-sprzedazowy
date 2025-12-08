@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
     <types>
-        <members>CampaignMember-LMA Campaign Member Layout</members>
-        <name>LAyout</name>
-    </types>
+    <members>LMS_Configuration__mdt</members>
+    <name>CustomObject</name>
+  </types>
+  <types>
+    <members>LMS_Funnel_Rule__mdt</members>
+    <name>CustomObject</name>
+  </types>
     <version>65.0</version>
 </Package>

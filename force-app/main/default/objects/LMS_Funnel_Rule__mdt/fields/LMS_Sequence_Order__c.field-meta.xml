@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>LMS_Sequence_Order__c</fullName>
+    <description>Specifies the order of the funnel stages. Doesn&apos;t have to start at 1 and can skip numbers.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Specifies the order of the funnel stages. Doesn&apos;t have to start at 1 and can skip numbers.</inlineHelpText>
+    <label>Sequence Order</label>
+    <precision>18</precision>
+    <required>true</required>
+    <scale>0</scale>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

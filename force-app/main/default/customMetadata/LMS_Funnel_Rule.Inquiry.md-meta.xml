@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Inquiry</label>
+    <protected>false</protected>
+    <values>
+        <field>LMS_Expected_Value__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>LMS_Field_API_Name__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>LMS_Funnel_Stage_Name__c</field>
+        <value xsi:type="xsd:string">Inquiry</value>
+    </values>
+    <values>
+        <field>LMS_Is_Active__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>LMS_Sequence_Order__c</field>
+        <value xsi:type="xsd:double">1.0</value>
+    </values>
+    <values>
+        <field>LMS_Trigger__c</field>
+        <value xsi:type="xsd:string">RESPONSE</value>
+    </values>
+</CustomMetadata>

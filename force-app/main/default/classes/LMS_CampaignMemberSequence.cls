@@ -67,7 +67,7 @@ public with sharing class LMS_CampaignMemberSequence {
         
         //musimy tylko coś zrobić, jeśli usuwany CM był aktywny w lejku
         for (CampaignMember cm : cmOldList) {
-            if (LMS_StatusManager.ACTIVESTATUSLIST.contains(cm.LMS_ResponseStatus__c)) {
+            if (LMS_StatusManager.getActiveStatusList().contains(cm.LMS_ResponseStatus__c)) {
                 if (cm.ContactId != null) contactIds.add(cm.ContactId);
                 else leadIds.add(cm.LeadId);
             }
@@ -82,9 +82,9 @@ public with sharing class LMS_CampaignMemberSequence {
         //ustawiamy status rodzica na Nurture
         for (SObject sobj : parents.values()) {
             if (sobj.getSObjectType() == Contact.SObjectType) {
-                ((Contact)sobj).LMS_ContactStatus__c = LMS_StatusManager.NURTURESTATUS;
+                ((Contact)sobj).LMS_ContactStatus__c = LMS_StatusManager.getNurtureStatus();
             } else {
-                ((Lead)sobj).Status = LMS_StatusManager.NURTURESTATUS;
+                ((Lead)sobj).Status = LMS_StatusManager.getNurtureStatus();
             }
         }
         
@@ -223,7 +223,7 @@ public with sharing class LMS_CampaignMemberSequence {
         Map<Id, SObject> parents = new Map<Id, SObject>();
         
         if (!leadIds.isEmpty()) {
-            List<Lead> leads = LMS_DatabaseQueryHelper.runQueryList('Id, LMS_FunnelScore__c, LMS_NurtureTimeout__c, ' + LMS_StatusManager.LEADSTATUSFIELD,
+            List<Lead> leads = LMS_DatabaseQueryHelper.runQueryList('Id, LMS_FunnelScore__c, LMS_NurtureTimeout__c, ' + LMS_StatusManager.getLeadStatusField(),
             'Lead', LMS_DatabaseQueryHelper.inIds('Id', leadIds));
             for (Lead l : leads) {
                 parents.put(l.Id, l);
@@ -231,7 +231,7 @@ public with sharing class LMS_CampaignMemberSequence {
         }
         
         if (!contactIds.isEmpty()) {
-            List<Contact> contacts = LMS_DatabaseQueryHelper.runQueryList('Id, LMS_FunnelScore__c, LMS_NurtureTimeout__c, ' + LMS_StatusManager.CONTACTSTATUSFIELD,
+            List<Contact> contacts = LMS_DatabaseQueryHelper.runQueryList('Id, LMS_FunnelScore__c, LMS_NurtureTimeout__c, ' + LMS_StatusManager.getContactStatusField(),
             'Contact', LMS_DatabaseQueryHelper.inIds('Id', contactIds));
             for (Contact c : contacts) {
                 parents.put(c.Id, c);
@@ -345,11 +345,11 @@ public with sharing class LMS_CampaignMemberSequence {
             
             if (parent.getSObjectType() == Contact.SObjectType) {
                 Contact c = (Contact) parent;
-                alreadyActive = LMS_StatusManager.ACTIVESTATUSLIST.contains(c.LMS_ContactStatus__c);
+                alreadyActive = LMS_StatusManager.getActiveStatusList().contains(c.LMS_ContactStatus__c);
             }
             else if (parent.getSObjectType() == Lead.SObjectType) {
                 Lead l = (Lead) parent;
-                alreadyActive = LMS_StatusManager.ACTIVESTATUSLIST.contains(l.Status);
+                alreadyActive = LMS_StatusManager.getActiveStatusList().contains(l.Status);
             }
             
             // Parent already active
@@ -362,10 +362,10 @@ public with sharing class LMS_CampaignMemberSequence {
             if (qualified.get(cm) == true) {
                 if (parent.getSObjectType() == Contact.SObjectType) {
                     ((Contact)parent).LMS_ContactStatus__c =
-                        LMS_StatusManager.FIRSTACTIVESTATUS;
+                        LMS_StatusManager.getFirstActiveStatus();
                 } else {
                     ((Lead)parent).Status =
-                        LMS_StatusManager.FIRSTACTIVESTATUS;
+                        LMS_StatusManager.getFirstActiveStatus();
                 }
                 LMS_FunnelSequence.setResponseStatus(cm, LMS_StatusManager.FIRSTACTIVESTATUS);
                 toUpdate.add(cm);

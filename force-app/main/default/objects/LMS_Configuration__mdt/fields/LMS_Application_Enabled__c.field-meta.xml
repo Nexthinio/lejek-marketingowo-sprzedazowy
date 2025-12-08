@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>LMS_Application_Enabled__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description>Defines if the application should react to changes made in the environment or not.</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Defines if the application should react to changes made in the environment or not.</inlineHelpText>
+    <label>Application Enabled</label>
+    <type>Checkbox</type>
+</CustomField>

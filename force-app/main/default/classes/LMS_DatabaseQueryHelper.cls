@@ -1,5 +1,5 @@
 public with sharing class LMS_DatabaseQueryHelper {
-    public static final Map<String, String> FUNNELSTATUSLIST = LMS_FunnelSequence.FUNNELSTATUSLIST;
+    public static final Map<String, String> FUNNELSTATUSLIST = LMS_FunnelSequence.getFunnelStatusList();
     
     /**
      * Pobiera zestaw wymaganych pól do zapytania dla rodzica CampaignMember (Contact lub Lead). Używa w tym celu etapów lejka.
@@ -15,14 +15,14 @@ public with sharing class LMS_DatabaseQueryHelper {
         
         for (String def : FUNNELSTATUSLIST.values()) {
             LMS_FunnelAction fa = LMS_FunnelAction.parse(def);
-            if (fa.action != 'PARENTCHANGE') continue;
+            if (fa.action != 'PARENTUPDATE') continue;
             if (String.isBlank(fa.fieldApi)) continue;
             
             if(fa.fieldApi == 'STATUS') {
                 if(isContact) {
-                    fields.add(LMS_StatusManager.CONTACTSTATUSFIELD);
+                    fields.add(LMS_StatusManager.getContactStatusField());
                 } else {
-                    fields.add(LMS_StatusManager.LEADSTATUSFIELD);
+                    fields.add(LMS_StatusManager.getLeadStatusField());
                 }
             } else {
                 fields.add(fa.fieldApi);
@@ -43,11 +43,11 @@ public with sharing class LMS_DatabaseQueryHelper {
         
         for (String def : FUNNELSTATUSLIST.values()) {
             LMS_FunnelAction fa = LMS_FunnelAction.parse(def);
-            if (fa.action != 'OPPORTUNITYCHANGE') continue;
+            if (fa.action != 'OPPORTUNITYUPDATE') continue;
             if (String.isBlank(fa.fieldApi)) continue;
             
             if(fa.fieldApi == 'STAGE') {
-                fields.add(LMS_StatusManager.OPPORTUNITYSTAGEFIELD);
+                fields.add(LMS_StatusManager.getOpportunityStageField());
             } else {
                 fields.add(fa.fieldApi);
             }
@@ -117,10 +117,10 @@ public with sharing class LMS_DatabaseQueryHelper {
             'Id', 'ContactId', 'LeadId', 'CampaignId', 'Status', 'LMS_ResponseStatus__c', 'IsDeleted'
         };
         
-        fields.add('Contact.' + LMS_StatusManager.CONTACTSTATUSFIELD);
-        fields.add('Lead.' + LMS_StatusManager.LEADSTATUSFIELD);
+        fields.add('Contact.' + LMS_StatusManager.getContactStatusField());
+        fields.add('Lead.' + LMS_StatusManager.getLeadStatusField());
         
-        for (String funnelStage : LMS_FunnelSequence.FUNNELSTATUSLIST.keySet()) {
+        for (String funnelStage : FUNNELSTATUSLIST.keySet()) {
             fields.add(LMS_FunnelSequence.getFunnelFieldName(funnelStage));
             fields.add(LMS_FunnelSequence.getFunnelFieldDateName(funnelStage));
         }
@@ -132,8 +132,9 @@ public with sharing class LMS_DatabaseQueryHelper {
     }
     
     
-    public static String buildActiveCampaignMemberWhere(Boolean isContact, Set<Id> contactIds, Set<Id> leadIds, List<String> activeStatusList) {
+    public static String buildActiveCampaignMemberWhere(Boolean isContact, Set<Id> contactIds, Set<Id> leadIds) {
         List<String> clauses = new List<String>();
+        List<String> activeStatusList = LMS_StatusManager.getActiveStatusList();
         
         if (isContact) {
             clauses.add(inIds('ContactId', contactIds));

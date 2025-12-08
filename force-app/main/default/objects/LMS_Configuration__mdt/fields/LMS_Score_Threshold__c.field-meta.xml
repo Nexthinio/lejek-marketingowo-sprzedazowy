@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>LMS_Score_Threshold__c</fullName>
+    <defaultValue>100</defaultValue>
+    <description>Defines the score threshold to reach using the sum of LMS_FunnelScore__c and LMS_CampaignScore__c scores on  leads/contacts and campaigns.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Defines the score threshold to reach using the sum of LMS_FunnelScore__c and LMS_CampaignScore__c scores on  leads/contacts and campaigns.</inlineHelpText>
+    <label>Score Threshold</label>
+    <precision>18</precision>
+    <required>true</required>
+    <scale>0</scale>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

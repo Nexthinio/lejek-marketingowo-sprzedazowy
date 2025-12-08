@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>LMS_Trigger__c</fullName>
+    <description>Defines the rule. Can be a field update on lead/contact or opportunity.</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <inlineHelpText>Defines the rule. Can be a field update on lead/contact or opportunity.</inlineHelpText>
+    <label>Trigger</label>
+    <required>true</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>RESPONSE</fullName>
+                <default>true</default>
+                <label>RESPONSE</label>
+            </value>
+            <value>
+                <fullName>ACTIVERESPONSE</fullName>
+                <default>false</default>
+                <label>ACTIVERESPONSE</label>
+            </value>
+            <value>
+                <fullName>PARENTUPDATE</fullName>
+                <default>false</default>
+                <label>PARENTUPDATE</label>
+            </value>
+            <value>
+                <fullName>NEWOPPORTUNITY</fullName>
+                <default>false</default>
+                <label>NEWOPPORTUNITY</label>
+            </value>
+            <value>
+                <fullName>OPPORTUNITYUPDATE</fullName>
+                <default>false</default>
+                <label>OPPORTUNITYUPDATE</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>
