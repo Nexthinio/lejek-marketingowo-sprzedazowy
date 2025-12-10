@@ -367,7 +367,7 @@ public with sharing class LMS_CampaignMemberSequence {
                     ((Lead)parent).Status =
                         LMS_StatusManager.getFirstActiveStatus();
                 }
-                LMS_FunnelSequence.setResponseStatus(cm, LMS_StatusManager.FIRSTACTIVESTATUS);
+                LMS_FunnelSequence.setResponseStatus(cm, LMS_StatusManager.getFirstActiveStatus());
                 toUpdate.add(cm);
             }
             // Not at threshold

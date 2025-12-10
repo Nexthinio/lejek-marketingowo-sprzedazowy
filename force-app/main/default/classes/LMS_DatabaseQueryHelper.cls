@@ -149,22 +149,22 @@ public with sharing class LMS_DatabaseQueryHelper {
     }
     
     public static List<SObject> runQueryList(String fields, String sObjectName, String whereClause) {
+        System.debug('---LMS_DatabaseQueryHelper: runQueryList---');
         String soql = 'SELECT ' + fields + ' FROM ' + sObjectName +
             (String.isBlank(whereClause) ? '' : ' WHERE ' + whereClause);
-        System.debug('---LMS_DatabaseQueryHelper: runQueryList---');
         System.debug('SOQL: ' + soql);
         return Database.query(soql);
     }
     
     public static String inIds(String fieldApi, Set<Id> ids) {
-        if (ids == null || ids.isEmpty()) return '1=0';
+        if (ids == null || ids.isEmpty()) return null;
         List<String> q = new List<String>();
         for (Id i : ids) q.add('\'' + String.valueOf(i) + '\'');
         return fieldApi + ' IN (' + String.join(q, ',') + ')';
     }
     
     public static String inStrings(String fieldApi, List<String> vals) {
-        if (vals == null || vals.isEmpty()) return '1=0';
+        if (vals == null || vals.isEmpty()) return null;
         List<String> q = new List<String>();
         for (String v : vals) q.add('\'' + String.escapeSingleQuotes(v) + '\'');
         return fieldApi + ' IN (' + String.join(q, ',') + ')';

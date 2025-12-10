@@ -39,11 +39,17 @@ public with sharing class LMS_FunnelSequence {
                 ORDER BY LMS_Sequence_Order__c ASC];
         }
         
-        /* Nigdy nie powinno się to zdarzyć, podobnie jak z konfiguracją aplikacji, ale trzeba sprawdzić i obsłużyć nulla.
-         * Rzucamy error.
-         */
+        // Nigdy nie powinno się to zdarzyć, podobnie jak z konfiguracją aplikacji, ale trzeba sprawdzić i obsłużyć nulla.
         if (funnelConfiguration.size() == 0) {
-            throw new IllegalArgumentException('Brak aktywnych reguł lejka w konfiguracji LMS_Funnel_Rule__mdt. Proszę dodać co najmniej jedną regułę.');
+            FUNNELSTATUSLIST = new Map<String, String>{
+                'Inquiry' => 'RESPONSE',
+                'MQL' => 'ACTIVERESPONSE',
+                'SAL' => 'PARENTUPDATE.STATUS.Attempting Contact',
+                'SQL' => 'PARENTUPDATE.STATUS.Qualified',
+                'SQO' => 'NEWOPPORTUNITY',
+                'Won' => 'OPPORTUNITYUPDATE.STAGE.Won'
+            };
+            return;
         }
         
         // Parsowanie do Map<nazwa etapu lejka, definicja>

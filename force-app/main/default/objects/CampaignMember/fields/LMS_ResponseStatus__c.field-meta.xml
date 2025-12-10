@@ -15,6 +15,11 @@
                 <label>Resolved - Not Qualified</label>
             </value>
             <value>
+                <fullName>Resolved - Merged</fullName>
+                <default>false</default>
+                <label>Resolved - Merged</label>
+            </value>
+            <value>
                 <fullName>Resolved - Already In Funnel</fullName>
                 <default>false</default>
                 <label>Resolved - Already In Funnel</label>
@@ -40,9 +45,9 @@
                 <label>Working</label>
             </value>
             <value>
-                <fullName>Attempted Contact</fullName>
+                <fullName>Attempting Contact</fullName>
                 <default>false</default>
-                <label>Attempted Contact</label>
+                <label>Attempting Contact</label>
             </value>
             <value>
                 <fullName>Qualified</fullName>
