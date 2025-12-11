@@ -33,7 +33,7 @@ public with sharing class LMS_StatusManager {
         if(configuration == null) {
             FIRSTACTIVESTATUS = 'Working';
         } else if(FIRSTACTIVESTATUS == null) {
-            FIRSTACTIVESTATUS = configuration.LMS_Active_Statuses_List__c.split(',')[0];
+            FIRSTACTIVESTATUS = configuration.LMS_Active_Statuses_List__c.split(', ')[0];
         }
         return FIRSTACTIVESTATUS;
     }
@@ -42,7 +42,7 @@ public with sharing class LMS_StatusManager {
         if(configuration == null) {
             ACTIVESTATUSLIST = new List<String>{'Working', 'Attempting Contact', 'Qualified', 'Active Opportunity'};
         } else if(ACTIVESTATUSLIST == null) {
-            ACTIVESTATUSLIST = configuration.LMS_Active_Statuses_List__c.split(',');
+            ACTIVESTATUSLIST = configuration.LMS_Active_Statuses_List__c.deleteWhitespace().split(', ');
         }
         return ACTIVESTATUSLIST;
     }
