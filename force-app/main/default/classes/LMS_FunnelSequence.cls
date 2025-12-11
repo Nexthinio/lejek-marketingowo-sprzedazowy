@@ -20,8 +20,16 @@ public with sharing class LMS_FunnelSequence {
     public static void startSequence(List<CampaignMember> cmList) {
         System.debug('---LMS_FunnelSequence: startSequence---');
         
-        for (CampaignMember cm : cmList) {
-            checkFunnelFields(cm);
+        startSequence(cmList, null);
+    }
+
+        public static void startSequence(List<CampaignMember> cmNewList, List<CampaignMember> cmOldList) {
+        System.debug('---LMS_FunnelSequence: startSequence---');
+        
+        for (Integer i = 0; i < cmNewList.size(); i++) {
+            CampaignMember newCm = cmNewList[i];
+            CampaignMember oldCm = cmOldList == null ? null : cmOldList[i];
+            checkFunnelFields(newCm, oldCm);
         }
     }
     
@@ -75,16 +83,16 @@ public with sharing class LMS_FunnelSequence {
      * @return void
      */
     
-    public static void checkFunnelFields(CampaignMember cm) {
+    public static void checkFunnelFields(CampaignMember newCm, CampaignMember oldCm) {
         System.debug('---LMS_FunnelSequence: checkFunnelFields---');
         for(String funnelStage : getFunnelStatusList().keySet()) {
             String def = getFunnelStatusList().get(funnelStage);
             LMS_FunnelAction action = LMS_FunnelAction.parse(def);
             
             switch on action.action {
-                when 'PARENTUPDATE'     { handleParentUpdate(cm, action, funnelStage); }
-                when 'OPPORTUNITYUPDATE' { handleOPPORTUNITYUPDATE(cm, action, funnelStage); }
-                when 'NEWOPPORTUNITY'   { System.debug('NEWOPPORTUNITY not implemented'); }
+                when 'PARENTUPDATE'     { handleParentUpdate(newCm, action, funnelStage); }
+                when 'OPPORTUNITYUPDATE' { handleOpportunityUpdate(newCm, action, funnelStage); }
+                when 'NEWOPPORTUNITY'   { handleNewOpportunity(newCm, action, funnelStage, oldCm); }
             }
         }
     }
@@ -135,6 +143,15 @@ public with sharing class LMS_FunnelSequence {
             }
         }
     }
+
+    private static void handleNewOpportunity(CampaignMember newCm, LMS_FunnelAction fa, String funnelStage, CampaignMember oldCM) {
+        System.debug('---LMS_FunnelSequence: handleNewOpportunity---');
+        if(oldCM == null) return;
+
+        if(oldCM.LMS_OpportunityName__c == null && newCm.LMS_OpportunityName__c != null) {
+            setFunnelStage(newCm, funnelStage);
+        }
+    }
     
     /**
      * Sprawdza czy dany etap lejka powinien zostać ustawiony na podstawie zmian w powiązanej Opportunity.
@@ -145,8 +162,8 @@ public with sharing class LMS_FunnelSequence {
      * @return void
      */
     
-    private static void handleOPPORTUNITYUPDATE(CampaignMember cm, LMS_FunnelAction fa, String funnelStage) {
-        System.debug('---LMS_FunnelSequence: handleOPPORTUNITYUPDATE---');
+    private static void handleOpportunityUpdate(CampaignMember cm, LMS_FunnelAction fa, String funnelStage) {
+        System.debug('---LMS_FunnelSequence: handleOpportunityUpdate---');
     }
     
     /**

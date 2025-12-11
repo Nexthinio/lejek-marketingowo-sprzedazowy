@@ -3,8 +3,8 @@
     <label>default</label>
     <protected>false</protected>
     <values>
-        <field>LMS_Active_Status_List__c</field>
-        <value xsi:type="xsd:string">Working, Attempting Contact, Qualified, Active Opportunity</value>
+        <field>LMS_Active_Statuses_List__c</field>
+        <value xsi:type="xsd:string">Working,Attempting Contact,Qualified,Active Opportunity</value>
     </values>
     <values>
         <field>LMS_Application_Enabled__c</field>

@@ -1,8 +1,8 @@
 public with sharing class LMS_CampaignMemberSequence {
-    public static List<CampaignMember> cmOldList { get; protected set; }
-    public static Map<Id, CampaignMember> cmOldMap { get; protected set; }
-    public static List<CampaignMember> cmNewList { get; protected set; }
-    public static Map<Id, CampaignMember> cmNewMap { get; protected set; }
+    private static List<CampaignMember> cmOldList = new List<CampaignMember>();
+    private static Map<Id, CampaignMember> cmOldMap = new Map<Id, CampaignMember>();
+    private static List<CampaignMember> cmNewList = new List<CampaignMember>();
+    private static Map<Id, CampaignMember> cmNewMap = new Map<Id, CampaignMember>();
     
     
     /**
@@ -14,7 +14,13 @@ public with sharing class LMS_CampaignMemberSequence {
     
     public static void startSequence(LMS_TriggerCopy triggerCopy) {
         System.debug('---LMS_CampaignMemberSequence: Entered---');
-        saveCMData(triggerCopy);
+        cmOldList = (List<CampaignMember>) triggerCopy.oldList;
+        cmOldMap  = (Map<Id, CampaignMember>) triggerCopy.oldMap;
+        
+        if (!triggerCopy.isDelete) {
+            cmNewList = (List<CampaignMember>) triggerCopy.newList;
+            cmNewMap = (Map<Id, CampaignMember>) triggerCopy.newMap;
+        }
         
         if (triggerCopy.isDelete) {
             handleDelete();
@@ -40,16 +46,7 @@ public with sharing class LMS_CampaignMemberSequence {
     private static void saveCMData(LMS_TriggerCopy triggerCopy) {
         System.debug('---LMS_CampaignMemberSequence: saveCMData---');
         
-        cmOldList = (List<CampaignMember>) triggerCopy.oldList;
-        cmOldMap  = (Map<Id, CampaignMember>) triggerCopy.oldMap;
         
-        if (!triggerCopy.isDelete) {
-            cmNewList = new List<CampaignMember>();
-            for (SObject sobj : triggerCopy.newList) {
-                cmNewList.add((CampaignMember) sobj);
-            }
-            cmNewMap = (Map<Id, CampaignMember>) triggerCopy.newMap;
-        }
     }
     
     /**
@@ -118,6 +115,7 @@ public with sharing class LMS_CampaignMemberSequence {
         System.debug('---LMS_CampaignMemberSequence: handleUpdate---');
         
         List<CampaignMember> toEvaluate = new List<CampaignMember>();
+        List<CampaignMember> activeCMs = new List<CampaignMember>();
         
         for (Integer i = 0; i < cmNewList.size(); i++) {
             CampaignMember newCm = cmNewList[i];
@@ -127,10 +125,21 @@ public with sharing class LMS_CampaignMemberSequence {
             if(newCm.LMS_ResponseStatus__c == LMS_StatusManager.NOTARESPONSE && detectResponse(newCM, true)) {
                 toEvaluate.add(newCm);
             }
+            
+            //CM jest aktywny
+            if(LMS_StatusManager.getActiveStatusList().contains(newCM.LMS_ResponseStatus__c)) {
+                activeCMs.add(newCm);
+            }
         }
-        if(toEvaluate.isEmpty()) return;
-        LMS_FunnelSequence.setInquiry(toEvaluate);
-        evaluateCMs(toEvaluate);
+        
+        if(!toEvaluate.isEmpty()) {
+            LMS_FunnelSequence.setInquiry(toEvaluate);
+            evaluateCMs(toEvaluate);
+        }
+        
+        if(!activeCMs.isEmpty()) {
+            LMS_FunnelSequence.startSequence(activeCMs);
+        }
     }
     
     /**

@@ -37,9 +37,9 @@ public with sharing class LMS_DatabaseQueryHelper {
      * @return Set<String> Zestaw nazw pól do zapytania
      */
     
-    private static Set<String> requiredFieldsForOpportunity() {
+    public static String requiredFieldsForOpportunity() {
         System.debug('---LMS_DatabaseQueryHelper: requiredFieldsForOpportunity---');
-        Set<String> fields = new Set<String>{ 'Id' };
+        Set<String> fields = new Set<String>{ 'Id', 'LMS_FunnelContact__c', 'LMS_ResponseID__c' };
         
         for (String def : FUNNELSTATUSLIST.values()) {
             LMS_FunnelAction fa = LMS_FunnelAction.parse(def);
@@ -52,7 +52,10 @@ public with sharing class LMS_DatabaseQueryHelper {
                 fields.add(fa.fieldApi);
             }
         }
-        return fields;
+        List<String> ordered = new List<String>();
+        ordered.addAll(fields);
+        ordered.sort();
+        return String.join(ordered, ',');
     }
     
     /**
@@ -89,15 +92,11 @@ public with sharing class LMS_DatabaseQueryHelper {
      */
     
     public static SObject queryOpportunity(CampaignMember cm) {
-        Set<String> fields = requiredFieldsForOpportunity();
+        String fields = requiredFieldsForOpportunity();
         Id oppId = cm.LMS_OpportunityName__c;
         
-        List<String> fieldList = new List<String>();
-        fieldList.addAll(fields);
-        fieldList.sort();
-        
         String soql =
-            'SELECT ' + String.join(fieldList, ',') +
+            'SELECT ' + fields +
             ' FROM Opportunity WHERE Id = :oppId';
         
         System.debug('Dynamic SOQL Parent: ' + soql);
@@ -114,7 +113,7 @@ public with sharing class LMS_DatabaseQueryHelper {
         System.debug('---LMS_FunnelSequence: getFunnelListFields---');
         
         Set<String> fields = new Set<String>{
-            'Id', 'ContactId', 'LeadId', 'CampaignId', 'Status', 'LMS_ResponseStatus__c', 'IsDeleted'
+            'Id', 'ContactId', 'LeadId', 'CampaignId', 'Status', 'LMS_ResponseStatus__c', 'IsDeleted, LMS_OpportunityName__c'
         };
         
         fields.add('Contact.' + LMS_StatusManager.getContactStatusField());
@@ -152,7 +151,7 @@ public with sharing class LMS_DatabaseQueryHelper {
         System.debug('---LMS_DatabaseQueryHelper: runQueryList---');
         String soql = 'SELECT ' + fields + ' FROM ' + sObjectName +
             (String.isBlank(whereClause) ? '' : ' WHERE ' + whereClause);
-        System.debug('SOQL: ' + soql);
+        System.debug('SOQL for '+ sObjectName + ': ' + soql);
         return Database.query(soql);
     }
     

@@ -4,12 +4,14 @@ public with sharing class LMS_StatusManager {
     private static String FIRSTACTIVESTATUS;
     private static List<String> ACTIVESTATUSLIST;
     //'Working', 'Attempting Contact', 'Qualified', 'Active Opportunity'
+    private static String ACTIVEOPPSTATUS;
     
     //CM related statuses - not configurable
     public static final String RESOLVEDALREADYACTIVE = 'Resolved - Already In Funnel';
     public static final String RESOLVEDNOTATTHRESHOLD = 'Resolved - Not Qualified';
     public static final String NOTARESPONSE = 'Not a Response';
     public static final String RESOLVEDMERGED = 'Resolved - Merged';
+    public static final String RESOLVEDOPPORTUNITYDELETED = 'Resolved - Opportunity Deleted';
     
     //Status related fields
     private static String CONTACTSTATUSFIELD;
@@ -43,6 +45,16 @@ public with sharing class LMS_StatusManager {
             ACTIVESTATUSLIST = configuration.LMS_Active_Statuses_List__c.split(',');
         }
         return ACTIVESTATUSLIST;
+    }
+    
+    public static String getActiveOppStatus() {
+        if(configuration == null) {
+            ACTIVEOPPSTATUS = 'Active Opportunity';
+        } else if(ACTIVEOPPSTATUS == null) {
+            List<String> statuses = configuration.LMS_Active_Statuses_List__c.split(',');
+            ACTIVEOPPSTATUS = statuses[statuses.size() - 1];
+        }
+        return ACTIVEOPPSTATUS;
     }
     
     public static String getContactStatusField() {

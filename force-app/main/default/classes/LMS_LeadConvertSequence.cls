@@ -8,6 +8,7 @@ public with sharing class LMS_LeadConvertSequence {
         leadNewList = lNewList;
         
         Map<Id, String> convertedContactIds = new Map<Id, String>();
+        Map<Id, Id> opportunityToContactMap = new Map<Id, Id>();
         
         for (Lead lNew : leadNewList) {
             Lead lOld = leadOldMap.get(lNew.Id);
@@ -17,6 +18,11 @@ public with sharing class LMS_LeadConvertSequence {
             
             // wykrycie konwersji
             if (!lOld.IsConverted && lNew.IsConverted && lNew.ConvertedContactId != null) {
+                //jeśli tworzone jest też opportunity
+                if(lNew.ConvertedOpportunityId != null) {
+                    opportunityToContactMap.put(lNew.ConvertedOpportunityId, lNew.ConvertedContactId);
+                }
+                
                 String leadStatus = (String) lOld.get(LMS_StatusManager.getLeadStatusField());
                 if (leadStatus != null) {
                     convertedContactIds.put(lNew.ConvertedContactId, leadStatus);
@@ -53,6 +59,10 @@ public with sharing class LMS_LeadConvertSequence {
         
         if(oldConvertedContactIds.size() > 0) {
             handleLeadConversionToExistingContact(oldConvertedContactIds, oldConvertedContacts);
+        }
+        
+        if(opportunityToContactMap.size() > 0) {
+            handleLeadConversionToOpportunity(opportunityToContactMap);
         }
     }
     
@@ -124,9 +134,33 @@ public with sharing class LMS_LeadConvertSequence {
     }
     
     
-    private static void handleLeadConversionToOpportunity(LMS_TriggerCopy triggerCopy) {
+    private static void handleLeadConversionToOpportunity(Map<Id, Id> opportunityToContactMap) {
         System.debug('---LMS_LeadConvertSequence: handleLeadConversionToOpportunity---');
         
-        // TODO
+        //SOQL dla oppek, użytych przy konwersji do kontaktu
+        String fields = LMS_DatabaseQueryHelper.requiredFieldsForOpportunity();
+        String whereClause = LMS_DatabaseQueryHelper.inIds('Id', opportunityToContactMap.keySet());
+        List<Opportunity> opportunities = (List<Opportunity>) LMS_DatabaseQueryHelper.runQueryList(fields, 'Opportunity', whereClause);
+        
+        //SOQL dla aktywnych CMów pod konwertowanymi kontaktami
+        Set<Id> contactIds = new Set<Id>(opportunityToContactMap.values());
+        fields = LMS_DatabaseQueryHelper.getCMFieldsToQuery();
+        whereClause = LMS_DatabaseQueryHelper.buildActiveCampaignMemberWhere(true, contactIds, new Set<Id>());
+        List<CampaignMember> activeCMs = (List<CampaignMember>) LMS_DatabaseQueryHelper.runQueryList(fields, 'CampaignMember', whereClause);
+        
+        //mapa kontaktu do aktywnego CMa
+        Map<Id, CampaignMember> cmByParentId = new Map<Id, CampaignMember>();
+        for (CampaignMember cm : activeCMs) {
+            Id parentId = (cm.ContactId != null) ? cm.ContactId : cm.LeadId;
+            if (!cmByParentId.containsKey(parentId) && cm.LMS_OpportunityName__c == null) {
+                cmByParentId.put(parentId, cm);
+            }
+        }
+        
+        for(Opportunity o : opportunities) {
+            Id cmId = cmByParentId.get(opportunityToContactMap.get(o.Id)).Id;
+            o.LMS_FunnelContact__c = opportunityToContactMap.get(o.Id);
+        }
+        update opportunities;
     }
 }

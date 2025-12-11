@@ -1,15 +1,15 @@
 public with sharing class LMS_LeadContactSequence {
-    public static List<Contact> conOldList { get; protected set; }
-    public static Map<Id, Contact> conOldMap { get; protected set; }
-    public static List<Contact> conNewList { get; protected set; }
-    public static Map<Id, Contact> conNewMap { get; protected set; }
+    private static List<Contact> conOldList = new List<Contact>();
+    private static Map<Id, Contact> conOldMap = new Map<Id, Contact>();
+    private static List<Contact> conNewList = new List<Contact>();
+    private static Map<Id, Contact> conNewMap = new Map<Id, Contact>();
     
-    public static List<Lead> leadOldList { get; protected set; }
-    public static Map<Id, Lead> leadOldMap { get; protected set; }
-    public static List<Lead> leadNewList { get; protected set; }
-    public static Map<Id, Lead> leadNewMap { get; protected set; }
+    private static List<Lead> leadOldList = new List<Lead>();
+    private static Map<Id, Lead> leadOldMap = new Map<Id, Lead>();
+    private static List<Lead> leadNewList = new List<Lead>();
+    private static Map<Id, Lead> leadNewMap = new Map<Id, Lead>();
     
-    public static Boolean isContact;
+    private static Boolean isContact;
     private static Boolean fromLeadConversion = false;
     
     /**
