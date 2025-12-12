@@ -85,6 +85,7 @@ public with sharing class LMS_OpportunitySequence {
             }
         }
         
+        if(cmByParentId.size() == 0) return;
         System.debug('cmByParentId: ' + cmByParentId);
         
         for(Opportunity o : opps) {
@@ -103,9 +104,11 @@ public with sharing class LMS_OpportunitySequence {
             System.debug('Oppka na CMie:' + cm.LMS_OpportunityName__c);
             if(cm != null) cmsToUpdate.add(cm);
         }
+        LMS_LeadContactSequence.setTurnOffTriggers(true);
         if(contactsToUpdate.size() > 0) update contactsToUpdate;
-        if(cmsToUpdate.size() > 0) update cmsToUpdate;
         if(oppsToUpdate.size() > 0) update oppsToUpdate;
+        LMS_LeadContactSequence.setTurnOffTriggers(false);
+        if(cmsToUpdate.size() > 0) update cmsToUpdate;
     }
     
     private static void handleDelete() {

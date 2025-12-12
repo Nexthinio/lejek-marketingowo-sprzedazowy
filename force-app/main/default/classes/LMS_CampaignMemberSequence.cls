@@ -14,6 +14,7 @@ public with sharing class LMS_CampaignMemberSequence {
     
     public static void startSequence(LMS_TriggerCopy triggerCopy) {
         System.debug('---LMS_CampaignMemberSequence: Entered---');
+        if(LMS_LeadContactSequence.getTurnOffTriggers()) return;
         cmOldList = (List<CampaignMember>) triggerCopy.oldList;
         cmOldMap  = (Map<Id, CampaignMember>) triggerCopy.oldMap;
         
@@ -138,7 +139,12 @@ public with sharing class LMS_CampaignMemberSequence {
         }
         
         if(!activeCMs.isEmpty()) {
-            LMS_FunnelSequence.startSequence(activeCMs);
+            List<CampaignMember> oldListCM = new List<CampaignMember>();
+
+            for(CampaignMember cm : activeCMs) {
+                oldListCM.add(cmOldMap.get(cm.Id));
+            }
+            LMS_FunnelSequence.startSequence(activeCMs, oldListCM);
         }
     }
     

@@ -33,7 +33,7 @@ public with sharing class LMS_StatusManager {
         if(configuration == null) {
             FIRSTACTIVESTATUS = 'Working';
         } else if(FIRSTACTIVESTATUS == null) {
-            FIRSTACTIVESTATUS = configuration.LMS_Active_Statuses_List__c.split(', ')[0];
+            FIRSTACTIVESTATUS = configuration.LMS_Active_Statuses_List__c.replaceAll(',\\s+', ',').split(',')[0];
         }
         return FIRSTACTIVESTATUS;
     }
@@ -42,7 +42,7 @@ public with sharing class LMS_StatusManager {
         if(configuration == null) {
             ACTIVESTATUSLIST = new List<String>{'Working', 'Attempting Contact', 'Qualified', 'Active Opportunity'};
         } else if(ACTIVESTATUSLIST == null) {
-            ACTIVESTATUSLIST = configuration.LMS_Active_Statuses_List__c.deleteWhitespace().split(', ');
+            ACTIVESTATUSLIST = configuration.LMS_Active_Statuses_List__c.replaceAll(',\\s+', ',').split(',');
         }
         return ACTIVESTATUSLIST;
     }
@@ -67,6 +67,9 @@ public with sharing class LMS_StatusManager {
     }
     
     public static String getLeadStatusField() {
+        System.debug(configuration);
+        System.debug(configuration.LMS_Lead_Status_Field__c);
+        System.debug(LEADSTATUSFIELD);
         if(configuration == null) {
             LEADSTATUSFIELD = 'Status';
         } else if(LEADSTATUSFIELD == null) {

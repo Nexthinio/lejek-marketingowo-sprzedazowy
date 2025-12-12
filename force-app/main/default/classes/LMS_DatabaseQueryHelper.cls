@@ -8,7 +8,7 @@ public with sharing class LMS_DatabaseQueryHelper {
      * @return Set<String> Zestaw nazw pól do zapytania
      */
     
-    private static Set<String> requiredFieldsForParent(Boolean isContact) {
+    public static Set<String> requiredFieldsForParent(Boolean isContact) {
         System.debug('---LMS_DatabaseQueryHelper: requiredFieldsForParent---');
         String sObj = isContact ? 'Contact' : 'Lead';
         Set<String> fields = new Set<String>{ 'Id' };
@@ -154,6 +154,7 @@ public with sharing class LMS_DatabaseQueryHelper {
         System.debug('SOQL for '+ sObjectName + ': ' + soql);
         return Database.query(soql);
     }
+    
     
     public static String inIds(String fieldApi, Set<Id> ids) {
         if (ids == null || ids.isEmpty()) return null;

@@ -11,6 +11,9 @@ public with sharing class LMS_FunnelSequence {
     
     private static Map<String, String> FUNNELSTATUSLIST = new Map<String, String>();
     
+    private static Map<Id, Contact> contactsById = new Map<Id, Contact>();
+    private static Map<Id, Lead> leadsById = new Map<Id, Lead>();
+    
     /**
      * Inicjuje sekwencję lejka dla podanej listy CampaignMemberów.
      *
@@ -18,16 +21,54 @@ public with sharing class LMS_FunnelSequence {
      */
     
     public static void startSequence(List<CampaignMember> cmList) {
-        System.debug('---LMS_FunnelSequence: startSequence---');
+        System.debug('---LMS_FunnelSequence: startSequence start---');
+        
+        Set<Id> contactIds = new Set<Id>();
+        for (CampaignMember cm : cmList) {
+            if (cm.ContactId != null) {
+                contactIds.add(cm.ContactId);
+            }
+        }
+        
+        if(contactIds.size() > 0) {
+            String fieldsForContacts = String.join(
+                new List<String>(LMS_DatabaseQueryHelper.requiredFieldsForParent(true)), ',');
+            
+            String whereClauseContact = LMS_DatabaseQueryHelper.inIds('Id', contactIds);
+            List<Contact> contacts = (List<Contact> )LMS_DatabaseQueryHelper.runQueryList(fieldsForContacts, 'Contact', whereClauseContact);
+            
+            contactsById.putAll(contacts);
+        }
+        
+        
+        Set<Id> leadIds = new Set<Id>();
+        for (CampaignMember cm : cmList) {
+            if (cm.LeadId != null) {
+                leadIds.add(cm.LeadId);
+            }
+        }
+        
+        if(leadIds.size() > 0) {
+            String fieldsForLeads = String.join(
+                new List<String>(LMS_DatabaseQueryHelper.requiredFieldsForParent(false)), ',');
+            
+            String whereClauseLead = LMS_DatabaseQueryHelper.inIds('Id', leadIds);
+            List<Lead> leads = (List<Lead>) LMS_DatabaseQueryHelper.runQueryList(fieldsForLeads, 'Lead', whereClauseLead);
+            
+            leadsById.putAll(leads);
+        }
         
         startSequence(cmList, null);
     }
-
-        public static void startSequence(List<CampaignMember> cmNewList, List<CampaignMember> cmOldList) {
+    
+    public static void startSequence(List<CampaignMember> cmNewList, List<CampaignMember> cmOldList) {
         System.debug('---LMS_FunnelSequence: startSequence---');
+        
+        System.debug(cmNewList.size());
         
         for (Integer i = 0; i < cmNewList.size(); i++) {
             CampaignMember newCm = cmNewList[i];
+            System.debug(newCm.Id);
             CampaignMember oldCm = cmOldList == null ? null : cmOldList[i];
             checkFunnelFields(newCm, oldCm);
         }
@@ -87,7 +128,10 @@ public with sharing class LMS_FunnelSequence {
         System.debug('---LMS_FunnelSequence: checkFunnelFields---');
         for(String funnelStage : getFunnelStatusList().keySet()) {
             String def = getFunnelStatusList().get(funnelStage);
+            System.debug('def: ' + def);
             LMS_FunnelAction action = LMS_FunnelAction.parse(def);
+            System.debug('action: ' + action);
+            System.debug('action.action: ' + action.action);
             
             switch on action.action {
                 when 'PARENTUPDATE'     { handleParentUpdate(newCm, action, funnelStage); }
@@ -143,13 +187,14 @@ public with sharing class LMS_FunnelSequence {
             }
         }
     }
-
+    
     private static void handleNewOpportunity(CampaignMember newCm, LMS_FunnelAction fa, String funnelStage, CampaignMember oldCM) {
         System.debug('---LMS_FunnelSequence: handleNewOpportunity---');
         if(oldCM == null) return;
-
+        
         if(oldCM.LMS_OpportunityName__c == null && newCm.LMS_OpportunityName__c != null) {
             setFunnelStage(newCm, funnelStage);
+            setResponseStatus(newCm, LMS_StatusManager.getActiveOppStatus());
         }
     }
     
@@ -211,10 +256,23 @@ public with sharing class LMS_FunnelSequence {
     
     public static void setResponseStatus(CampaignMember cm) {
         System.debug('---LMS_FunnelSequence: setResponseStatus---');
-        if(cm.ContactId != null) {
-            cm.put('LMS_ResponseStatus__c', cm.Contact.get(LMS_StatusManager.getContactStatusField()) );
-        } else {
-            cm.put('LMS_ResponseStatus__c', cm.Lead.get(LMS_StatusManager.getLeadStatusField()));
+        
+        if (cm.ContactId != null) {
+            Contact c = contactsById.get(cm.ContactId);
+            if (c != null) {
+                cm.put(
+                    'LMS_ResponseStatus__c',
+                c.get(LMS_StatusManager.getContactStatusField())
+                    );
+            }
+        } else if (cm.LeadId != null) {
+            Lead l = leadsById.get(cm.LeadId);
+            if (l != null) {
+                cm.put(
+                    'LMS_ResponseStatus__c',
+                l.get(LMS_StatusManager.getLeadStatusField())
+                    );
+            }
         }
     }
     

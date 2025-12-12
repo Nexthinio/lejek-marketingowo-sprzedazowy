@@ -128,9 +128,9 @@ public with sharing class LMS_LeadConvertSequence {
             contactsList.add(c);
         }
         
-        LMS_LeadContactSequence.setFromLeadConversion(true);
+        LMS_LeadContactSequence.setturnOffTriggers(true);
         update contactsList;
-        LMS_LeadContactSequence.setFromLeadConversion(false);
+        LMS_LeadContactSequence.setturnOffTriggers(false);
     }
     
     

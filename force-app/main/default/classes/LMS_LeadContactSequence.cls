@@ -10,7 +10,7 @@ public with sharing class LMS_LeadContactSequence {
     private static Map<Id, Lead> leadNewMap = new Map<Id, Lead>();
     
     private static Boolean isContact;
-    private static Boolean fromLeadConversion = false;
+    private static Boolean turnOffTriggers = false;
     
     /**
      * Inicjuje sekwencję dla Lead lub Contact.
@@ -19,8 +19,12 @@ public with sharing class LMS_LeadContactSequence {
      * @return void
      */
     
-    public static void setFromLeadConversion(Boolean value) {
-        fromLeadConversion = value;
+    public static void setTurnOffTriggers(Boolean value) {
+        turnOffTriggers = value;
+    }
+
+    public static Boolean getTurnOffTriggers() {
+        return turnOffTriggers;
     }
     
     public static void startSequence(Schema.sObjectType triggeringObject, LMS_TriggerCopy triggerCopy) {
@@ -55,7 +59,7 @@ public with sharing class LMS_LeadContactSequence {
     private static void handleUpdate(LMS_TriggerCopy triggerCopy) {
         System.debug('---LMS_LeadContactSequence: handleUpdate---');
         
-        if(fromLeadConversion) {
+        if(turnOffTriggers) {
             /* To co miało zostać obsłużone podczas konwersji leadów zostało już obsłużone, nie musimy tego robić ponownie.
              * Wchodzimy tu ponownie przez aktualizację statusu kontaktu
              */
@@ -130,7 +134,9 @@ public with sharing class LMS_LeadContactSequence {
         
         if (!activeCMs.isEmpty()) {
             LMS_FunnelSequence.startSequence(activeCMs);
+            turnOffTriggers = true;
             update activeCMs;
+            turnOffTriggers = false;
         }
     }
     
