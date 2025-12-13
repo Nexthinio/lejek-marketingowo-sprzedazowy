@@ -1,5 +1,28 @@
 public with sharing class LMS_Utils {
     
+    private static Boolean turnOffTriggers = false;
+    
+    /**
+     * Zmienia wartość zmiennej turnOffTriggers.
+     *
+     * @param value Oczekiwana wartość.
+     * @return void
+     */
+    
+    public static void setTurnOffTriggers(Boolean value) {
+        turnOffTriggers = value;
+    }
+    
+    /**
+     * Zwraca wartość zmiennej turnOffTriggers.
+     *
+     * @return void
+     */
+    
+    public static Boolean getTurnOffTriggers() {
+        return turnOffTriggers;
+    }
+    
     /**
      * Konwertuje wartość obiektu na Integer.
      *

@@ -12,6 +12,8 @@ public with sharing class LMS_StatusManager {
     public static final String NOTARESPONSE = 'Not a Response';
     public static final String RESOLVEDMERGED = 'Resolved - Merged';
     public static final String RESOLVEDOPPORTUNITYDELETED = 'Resolved - Opportunity Deleted';
+    public static final String RESOLVEDOPPORTUNITYWON = 'Resolved - Opportunity Won';
+    public static final String RESOLVEDOPPORTUNITYLOST = 'Resolved - Opportunity Lost';
     
     //Status related fields
     private static String CONTACTSTATUSFIELD;
@@ -19,6 +21,13 @@ public with sharing class LMS_StatusManager {
     private static String OPPORTUNITYSTAGEFIELD;
     
     private static LMS_Configuration__mdt configuration = LMS_Configuration__mdt.getInstance('default');
+    
+    /**
+     * Wszystkie metody poniżej zwracają odpowiedni status. Jeśli wartość nie została jeszcze ustawiona, pobierana jest z metadanych.
+     * Jeśli obiekt metadanych nie istnieje, przypisują domyślną wartość.
+     *
+     * @return void
+     */
     
     public static String getNurtureStatus() {
         if(configuration == null) {
@@ -67,9 +76,6 @@ public with sharing class LMS_StatusManager {
     }
     
     public static String getLeadStatusField() {
-        System.debug(configuration);
-        System.debug(configuration.LMS_Lead_Status_Field__c);
-        System.debug(LEADSTATUSFIELD);
         if(configuration == null) {
             LEADSTATUSFIELD = 'Status';
         } else if(LEADSTATUSFIELD == null) {

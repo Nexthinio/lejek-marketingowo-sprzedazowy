@@ -10,7 +10,6 @@ public with sharing class LMS_LeadContactSequence {
     private static Map<Id, Lead> leadNewMap = new Map<Id, Lead>();
     
     private static Boolean isContact;
-    private static Boolean turnOffTriggers = false;
     
     /**
      * Inicjuje sekwencję dla Lead lub Contact.
@@ -18,14 +17,6 @@ public with sharing class LMS_LeadContactSequence {
      * @param triggerCopy Kopia triggera z danymi
      * @return void
      */
-    
-    public static void setTurnOffTriggers(Boolean value) {
-        turnOffTriggers = value;
-    }
-
-    public static Boolean getTurnOffTriggers() {
-        return turnOffTriggers;
-    }
     
     public static void startSequence(Schema.sObjectType triggeringObject, LMS_TriggerCopy triggerCopy) {
         System.debug('---LMS_LeadContactSequence: Entered---');
@@ -59,7 +50,7 @@ public with sharing class LMS_LeadContactSequence {
     private static void handleUpdate(LMS_TriggerCopy triggerCopy) {
         System.debug('---LMS_LeadContactSequence: handleUpdate---');
         
-        if(turnOffTriggers) {
+        if(LMS_Utils.getTurnOffTriggers()) {
             /* To co miało zostać obsłużone podczas konwersji leadów zostało już obsłużone, nie musimy tego robić ponownie.
              * Wchodzimy tu ponownie przez aktualizację statusu kontaktu
              */
@@ -134,22 +125,9 @@ public with sharing class LMS_LeadContactSequence {
         
         if (!activeCMs.isEmpty()) {
             LMS_FunnelSequence.startSequence(activeCMs);
-            turnOffTriggers = true;
+            LMS_Utils.setTurnOffTriggers(true);
             update activeCMs;
-            turnOffTriggers = false;
+            LMS_Utils.setTurnOffTriggers(false);
         }
     }
-    
-    /**
-     * Kopiuje status Lead do powiązanego Contact podczas konwersji.
-     *
-     * @return void
-     */
-    
-    public static void copyLeadStatusToContactOnConvert() {
-        System.debug('---LMS_LeadContactSequence: copyLeadStatusToContactOnConvert---');
-        // Zbieramy leady, które właśnie są konwertowane
-        
-    }
-    
 }

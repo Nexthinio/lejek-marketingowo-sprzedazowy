@@ -31,6 +31,37 @@ public with sharing class LMS_OpportunitySequence {
         }
     }
     
+    /**
+     * Obsługuje usunięcie Opportunity.
+     *
+     * @return void
+     */
+    
+    private static void handleDelete() {
+        System.debug('---LMS_OpportunitySequence: handleDelete---');
+        List<CampaignMember> cmsToClose = new List<CampaignMember>();
+        List<Contact> contactsToClose = new List<Contact>();
+        for(Opportunity opp : oppOldList) {
+            contactsToClose.add(
+                new Contact(Id = opp.LMS_FunnelContact__c, LMS_ContactStatus__c = LMS_StatusManager.getNurtureStatus())
+                );
+            CampaignMember cm = new CampaignMember(Id = opp.LMS_ResponseID__c, LMS_ResponseStatus__c = LMS_StatusManager.RESOLVEDOPPORTUNITYDELETED);
+            if(cm != null) cmsToClose.add(cm);
+        }
+        try {
+            if(cmsToClose.size() > 0) update cmsToClose;
+            if(contactsToClose.size() > 0) update contactsToClose;
+        } catch(Exception e) {
+            
+        }
+    }
+    
+    /**
+     * Obsługuje tworzenie nowej Opportunity.
+     *
+     * @return void
+     */
+    
     private static void handleInsert() {
         System.debug('---LMS_OpportunitySequence: handleInsert---');
         List<Opportunity> oppsToEvaluate = new List<Opportunity>();
@@ -45,23 +76,84 @@ public with sharing class LMS_OpportunitySequence {
         }
     }
     
+    /**
+     * Obsługuje aktualizację Opportunity.
+     *
+     * @return void
+     */
+    
     private static void handleUpdate() {
         System.debug('---LMS_OpportunitySequence: handleUpdate---');
-        List<Opportunity> oppsToEvaluate = new List<Opportunity>();
+        List<Opportunity> oppsAddedFunnel = new List<Opportunity>();
+        Set<Id> oppsClosedIds = new Set<Id>();
+        Set<Id> normalUpdateOpps = new Set<Id>();
         
         for(Integer i = 0; i < oppNewList.size(); i++) {
             Opportunity oldOpp = oppOldList[i];
             Opportunity newOpp = oppNewMap.get(oldOpp.Id);
             //dodano funnel contact
             if(oldOpp.LMS_FunnelContact__c == null & newOpp.LMS_FunnelContact__c != null) {
-                oppsToEvaluate.add(oppNewList[i]);
+                oppsAddedFunnel.add(newOpp);
+            }
+            
+            if(oldOpp.IsClosed == false & newOpp.IsClosed == true) {
+                oppsClosedIds.add(newOpp.Id);
+            }
+            
+            if(!oppsAddedFunnel.contains(newOpp) && !oppsClosedIds.contains(newOpp.Id)) {
+                normalUpdateOpps.add(newOpp.Id);
             }
         }
         
-        if(oppsToEvaluate.size() > 0) {
-            attachFunnel(oppsToEvaluate);
+        if(oppsAddedFunnel.size() > 0) {
+            attachFunnel(oppsAddedFunnel);
+        }
+        
+        if(oppsClosedIds.size() > 0) {
+            String fields = LMS_DatabaseQueryHelper.getCMFieldsToQuery();
+            String whereClause = LMS_DatabaseQueryHelper.inIds('LMS_OpportunityName__c', oppsClosedIds);
+            List<CampaignMember> cmsToClose = (List<CampaignMember>) LMS_DatabaseQueryHelper.runQueryList(fields, 'CampaignMember', whereClause);
+            Set<Id> contactIds = new Set<Id>();
+            
+            for(CampaignMember cm : cmsToClose) {
+                if(cm.LMS_OpportunityName__r.IsWon) {
+                    LMS_FunnelSequence.setResponseStatus(cm, LMS_StatusManager.RESOLVEDOPPORTUNITYWON);
+                }
+                else {
+                    LMS_FunnelSequence.setResponseStatus(cm, LMS_StatusManager.RESOLVEDOPPORTUNITYLOST);
+                }
+                contactIds.add(cm.ContactId);
+            }
+            
+            Set<String> fieldsSet = LMS_DatabaseQueryHelper.requiredFieldsForParent(true);
+            fields = String.join(fieldsSet, ',');
+            whereClause = LMS_DatabaseQueryHelper.inIds('Id', contactIds);
+            List<Contact> contactsToClose = (List<Contact>) LMS_DatabaseQueryHelper.runQueryList(fields, 'Contact', whereClause);
+            
+            for(Contact c : contactsToClose) {
+                c.LMS_ContactStatus__c = LMS_StatusManager.getNurtureStatus();
+            }
+            
+            LMS_Utils.setTurnOffTriggers(true);
+            update contactsToClose;
+            LMS_Utils.setTurnOffTriggers(false);
+            update cmsToClose;
+        }
+        
+        if(normalUpdateOpps.size() > 0) {
+            String fields = LMS_DatabaseQueryHelper.getCMFieldsToQuery();
+            String whereClause = LMS_DatabaseQueryHelper.inIds('LMS_OpportunityName__c', normalUpdateOpps);
+            List<CampaignMember> cmsToUpdate = (List<CampaignMember>) LMS_DatabaseQueryHelper.runQueryList(fields, 'CampaignMember', whereClause);
+            LMS_FunnelSequence.startSequence(cmsToUpdate);
         }
     }
+    
+    /**
+     * Przywiązuje odpowiedni lejek do Opportunity.
+     *
+     * @param opps Opportunity do przywiązania.
+     * @return void
+     */
     
     private static void attachFunnel(List<Opportunity> opps) {
         System.debug('---LMS_OpportunitySequence: attachFunnel---');
@@ -86,10 +178,8 @@ public with sharing class LMS_OpportunitySequence {
         }
         
         if(cmByParentId.size() == 0) return;
-        System.debug('cmByParentId: ' + cmByParentId);
         
         for(Opportunity o : opps) {
-            System.debug('ID OPKI: ' + o.Id);
             contactsToUpdate.add(
                 new Contact(Id = o.LMS_FunnelContact__c, LMS_ContactStatus__c = LMS_StatusManager.getActiveOppStatus())
                 );
@@ -101,32 +191,12 @@ public with sharing class LMS_OpportunitySequence {
                 )
                 );
             CampaignMember cm = new CampaignMember(Id = cmId, LMS_OpportunityName__c = o.Id);
-            System.debug('Oppka na CMie:' + cm.LMS_OpportunityName__c);
             if(cm != null) cmsToUpdate.add(cm);
         }
-        LMS_LeadContactSequence.setTurnOffTriggers(true);
+        LMS_Utils.setTurnOffTriggers(true);
         if(contactsToUpdate.size() > 0) update contactsToUpdate;
         if(oppsToUpdate.size() > 0) update oppsToUpdate;
-        LMS_LeadContactSequence.setTurnOffTriggers(false);
+        LMS_Utils.setTurnOffTriggers(false);
         if(cmsToUpdate.size() > 0) update cmsToUpdate;
-    }
-    
-    private static void handleDelete() {
-        System.debug('---LMS_OpportunitySequence: handleDelete---');
-        List<CampaignMember> cmsToClose = new List<CampaignMember>();
-        List<Contact> contactsToClose = new List<Contact>();
-        for(Opportunity opp : oppOldList) {
-            contactsToClose.add(
-                new Contact(Id = opp.LMS_FunnelContact__c, LMS_ContactStatus__c = LMS_StatusManager.getNurtureStatus())
-                );
-            CampaignMember cm = new CampaignMember(Id = opp.LMS_ResponseID__c, LMS_ResponseStatus__c = LMS_StatusManager.RESOLVEDOPPORTUNITYDELETED);
-            if(cm != null) cmsToClose.add(cm);
-        }
-        try {
-            if(cmsToClose.size() > 0) update cmsToClose;
-            if(contactsToClose.size() > 0) update contactsToClose;
-        } catch(Exception e) {
-            
-        }
     }
 }

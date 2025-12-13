@@ -81,7 +81,6 @@ public with sharing class LMS_DatabaseQueryHelper {
             ' FROM ' + sObj +
             ' WHERE Id = :parentId';
         
-        System.debug('Dynamic SOQL Parent: ' + soql);
         return Database.query(soql);
     }
     
@@ -99,7 +98,6 @@ public with sharing class LMS_DatabaseQueryHelper {
             'SELECT ' + fields +
             ' FROM Opportunity WHERE Id = :oppId';
         
-        System.debug('Dynamic SOQL Parent: ' + soql);
         return Database.query(soql);
     }
     
@@ -113,7 +111,7 @@ public with sharing class LMS_DatabaseQueryHelper {
         System.debug('---LMS_FunnelSequence: getFunnelListFields---');
         
         Set<String> fields = new Set<String>{
-            'Id', 'ContactId', 'LeadId', 'CampaignId', 'Status', 'LMS_ResponseStatus__c', 'IsDeleted, LMS_OpportunityName__c'
+            'Id', 'ContactId', 'LeadId', 'CampaignId', 'Status', 'LMS_ResponseStatus__c', 'IsDeleted, LMS_OpportunityName__c, LMS_OpportunityName__r.IsWon, LMS_OpportunityName__r.IsClosed'
         };
         
         fields.add('Contact.' + LMS_StatusManager.getContactStatusField());
@@ -130,6 +128,14 @@ public with sharing class LMS_DatabaseQueryHelper {
         return String.join(ordered, ',');
     }
     
+    /**
+     * Buduje klauzulę WHERE do zapytania SOQL znajdującą aktywne lejki dla podanych kontaktów/leadów.
+     *
+     * @param isContact Flaga, ustalająca czy mamy do czynienia z kontaktami czy leadami
+     * @param contactIds ID kontaktów
+     * @param leadIds ID leadów
+     * @return String Klauzula WHERE do zapytania SOQL
+     */
     
     public static String buildActiveCampaignMemberWhere(Boolean isContact, Set<Id> contactIds, Set<Id> leadIds) {
         List<String> clauses = new List<String>();
@@ -147,14 +153,27 @@ public with sharing class LMS_DatabaseQueryHelper {
         return String.join(clauses, ' AND ');
     }
     
+    /**
+     * Wykonuje zapytanie SOQL i zwraca wynik w postaci List<SObject> dzięki czemu funkcja jest uniwersalna. Pozwala wykonywać dynamiczne zapytania.
+     * @param fields Pola do zwrócenia
+     * @param sObjectName Nazwa obiektu
+     * @param whereClause Klauzula WHERE
+     * @return List<SObject> Wynik zapytania
+     */
+    
     public static List<SObject> runQueryList(String fields, String sObjectName, String whereClause) {
         System.debug('---LMS_DatabaseQueryHelper: runQueryList---');
         String soql = 'SELECT ' + fields + ' FROM ' + sObjectName +
             (String.isBlank(whereClause) ? '' : ' WHERE ' + whereClause);
-        System.debug('SOQL for '+ sObjectName + ': ' + soql);
         return Database.query(soql);
     }
     
+    /**
+     * Pozwala stworzyć klauzulę WHERE, w której chcemy znaleźć rekordy o danych ID.
+     * @param fieldApi Nazwa API pola które porównujemy
+     * @param ids ID których szukamy
+     * @return String Zwraca tekst zawierający zbudowaną klauzulę where.
+     */
     
     public static String inIds(String fieldApi, Set<Id> ids) {
         if (ids == null || ids.isEmpty()) return null;
@@ -162,6 +181,13 @@ public with sharing class LMS_DatabaseQueryHelper {
         for (Id i : ids) q.add('\'' + String.valueOf(i) + '\'');
         return fieldApi + ' IN (' + String.join(q, ',') + ')';
     }
+    
+    /**
+     * Pozwala stworzyć klauzulę WHERE, w której chcemy znaleźć rekordy, które posiadają dane pole o podanych wartościach.
+     * @param fieldApi Nazwa API pola które porównujemy
+     * @param vals Szukane wartości
+     * @return String Zwraca tekst zawierający zbudowaną klauzulę where.
+     */
     
     public static String inStrings(String fieldApi, List<String> vals) {
         if (vals == null || vals.isEmpty()) return null;

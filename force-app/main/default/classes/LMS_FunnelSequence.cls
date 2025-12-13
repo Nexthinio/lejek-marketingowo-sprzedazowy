@@ -64,15 +64,17 @@ public with sharing class LMS_FunnelSequence {
     public static void startSequence(List<CampaignMember> cmNewList, List<CampaignMember> cmOldList) {
         System.debug('---LMS_FunnelSequence: startSequence---');
         
-        System.debug(cmNewList.size());
-        
         for (Integer i = 0; i < cmNewList.size(); i++) {
             CampaignMember newCm = cmNewList[i];
-            System.debug(newCm.Id);
             CampaignMember oldCm = cmOldList == null ? null : cmOldList[i];
             checkFunnelFields(newCm, oldCm);
         }
     }
+    
+    /**
+     * Pobiera mapę etapów lejka. Jeśli lista jest pusta, wywołuje metodę initializeConfiguration().
+     * @return Map<String, String> Zwraca mapę etapów lejka: nazwa etapu => definicja.
+     */
     
     public static Map<String, String> getFunnelStatusList() {
         if(FUNNELSTATUSLIST.isEmpty()) {
@@ -80,6 +82,11 @@ public with sharing class LMS_FunnelSequence {
         }
         return FUNNELSTATUSLIST;
     }
+    
+    /**
+     * Wypełnia FUNNELSTATUSLIST na podstawię danych w Metadata Types.
+     * @return void
+     */
     
     private static void initializeConfiguration() {
         if (funnelConfiguration == null) {
@@ -128,10 +135,7 @@ public with sharing class LMS_FunnelSequence {
         System.debug('---LMS_FunnelSequence: checkFunnelFields---');
         for(String funnelStage : getFunnelStatusList().keySet()) {
             String def = getFunnelStatusList().get(funnelStage);
-            System.debug('def: ' + def);
             LMS_FunnelAction action = LMS_FunnelAction.parse(def);
-            System.debug('action: ' + action);
-            System.debug('action.action: ' + action.action);
             
             switch on action.action {
                 when 'PARENTUPDATE'     { handleParentUpdate(newCm, action, funnelStage); }
@@ -167,26 +171,36 @@ public with sharing class LMS_FunnelSequence {
         
         if(fa.fieldApi == 'STATUS') {
             if(c != null) {
-                if(c.get(contactStatusName) == fa.expected) {
+                if(String.valueOf(c.get(contactStatusName)) == fa.expected) {
                     setFunnelStage(cm, funnelStage);
                 }
             } else {
-                if(l.get(leadStatusName) == fa.expected) {
+                if(String.valueOf(l.get(leadStatusName)) == fa.expected) {
                     setFunnelStage(cm, funnelStage);
                 }
             }
         } else {
             if(c != null) {
-                if(c.get(fa.fieldApi) == fa.expected) {
+                if(String.valueOf(c.get(fa.fieldApi)) == fa.expected) {
                     setFunnelStage(cm, funnelStage);
                 }
             } else {
-                if(l.get(fa.fieldApi) == fa.expected) {
+                if(String.valueOf(l.get(fa.fieldApi)) == fa.expected) {
                     setFunnelStage(cm, funnelStage);
                 }
             }
         }
     }
+    
+    /**
+     * Sprawdza czy dany etap lejka powinien zostać ustawiony przy stworzeniu Opportunity.
+     *
+     * @param cm CampaignMember podlegający ewaluacji.
+     * @param fa Definicja etapu lejka.
+     * @param funnelStage Nazwa obecnie rozpatrywanego etapu lejka.
+     * @param oldCm Wersja CampaignMember przed zmianą.
+     * @return void
+     */
     
     private static void handleNewOpportunity(CampaignMember newCm, LMS_FunnelAction fa, String funnelStage, CampaignMember oldCM) {
         System.debug('---LMS_FunnelSequence: handleNewOpportunity---');
@@ -209,6 +223,21 @@ public with sharing class LMS_FunnelSequence {
     
     private static void handleOpportunityUpdate(CampaignMember cm, LMS_FunnelAction fa, String funnelStage) {
         System.debug('---LMS_FunnelSequence: handleOpportunityUpdate---');
+        
+        if(cm.LMS_OpportunityName__c == null) return;
+        
+        Opportunity opp = (Opportunity) LMS_DatabaseQueryHelper.queryOpportunity(cm);
+        String oppStageName = LMS_StatusManager.getOpportunityStageField();
+        
+        if(fa.fieldApi == 'STAGE' || fa.fieldApi == 'STATUS') {
+            if(String.valueOf(opp.get(oppStageName)) == fa.expected) {
+                setFunnelStage(cm, funnelStage);
+            }
+        } else {
+            if(String.valueOf(opp.get(fa.fieldApi)) == fa.expected) {
+                setFunnelStage(cm, funnelStage);
+            }
+        }
     }
     
     /**
@@ -229,7 +258,6 @@ public with sharing class LMS_FunnelSequence {
         
         // przejdź przez wszystkie inne stages
         for (String stage : getFunnelStatusList().keySet()) {
-            System.debug('Sprawdzany stage: ' + stage);
             if (stage == funnelStage) {
                 break;
             }

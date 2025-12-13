@@ -14,7 +14,7 @@ public with sharing class LMS_CampaignMemberSequence {
     
     public static void startSequence(LMS_TriggerCopy triggerCopy) {
         System.debug('---LMS_CampaignMemberSequence: Entered---');
-        if(LMS_LeadContactSequence.getTurnOffTriggers()) return;
+        if(LMS_Utils.getTurnOffTriggers()) return;
         cmOldList = (List<CampaignMember>) triggerCopy.oldList;
         cmOldMap  = (Map<Id, CampaignMember>) triggerCopy.oldMap;
         
@@ -35,19 +35,6 @@ public with sharing class LMS_CampaignMemberSequence {
             handleUpdate();
             return;
         }
-    }
-    
-    /**
-     * Zapisuje dane CampaignMember z obiektu TriggerCopy do zmiennych statycznych klasy.
-     *
-     * @param triggerCopy TriggerCopy obiekt zawierający dane z triggera
-     * @return void
-     */
-    
-    private static void saveCMData(LMS_TriggerCopy triggerCopy) {
-        System.debug('---LMS_CampaignMemberSequence: saveCMData---');
-        
-        
     }
     
     /**
@@ -106,9 +93,8 @@ public with sharing class LMS_CampaignMemberSequence {
     }
     
     /**
-     * Zaczyna sekwencję przetwarzania dla obiektu CampaignMember na podstawie danych z triggera.
+     * Obsługuje aktualizację CampaignMembera
      *
-     * @param triggerCopy TriggerCopy obiekt zawierający dane z triggera
      * @return void
      */
     
@@ -127,8 +113,11 @@ public with sharing class LMS_CampaignMemberSequence {
                 toEvaluate.add(newCm);
             }
             
-            //CM jest aktywny
-            if(LMS_StatusManager.getActiveStatusList().contains(newCM.LMS_ResponseStatus__c)) {
+            Boolean isActive = LMS_StatusManager.getActiveStatusList().contains(newCM.LMS_ResponseStatus__c);
+            Boolean oppJustClosedWon = newCM.LMS_ResponseStatus__c == LMS_StatusManager.RESOLVEDOPPORTUNITYWON && oldCm.LMS_ResponseStatus__c != LMS_StatusManager.RESOLVEDOPPORTUNITYWON;
+            Boolean oppJustClosedLost = newCM.LMS_ResponseStatus__c == LMS_StatusManager.RESOLVEDOPPORTUNITYLOST && oldCm.LMS_ResponseStatus__c != LMS_StatusManager.RESOLVEDOPPORTUNITYLOST;
+            
+            if(isActive || oppJustClosedWon || oppJustClosedLost) { //cm jest zamykany po przegranej oppce
                 activeCMs.add(newCm);
             }
         }
@@ -140,7 +129,7 @@ public with sharing class LMS_CampaignMemberSequence {
         
         if(!activeCMs.isEmpty()) {
             List<CampaignMember> oldListCM = new List<CampaignMember>();
-
+            
             for(CampaignMember cm : activeCMs) {
                 oldListCM.add(cmOldMap.get(cm.Id));
             }

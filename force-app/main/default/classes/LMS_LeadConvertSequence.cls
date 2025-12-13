@@ -2,6 +2,14 @@ public with sharing class LMS_LeadConvertSequence {
     private static Map<Id, Lead> leadOldMap;
     private static List<Lead> leadNewList;
     
+    /**
+     * Zaczyna sekwencję konwersji z leada na kontakt.
+     *
+     * @param lOldMap Mapa starych Leadów.
+     * @param lNewList Lista nowych Leadów.
+     * @return void
+     */
+    
     public static void startSequence(Map<Id, Lead> lOldMap, List<Lead> lNewList) {
         System.debug('---LMS_LeadConvertSequence: Entered---');
         leadOldMap = lOldMap;
@@ -13,8 +21,6 @@ public with sharing class LMS_LeadConvertSequence {
         for (Lead lNew : leadNewList) {
             Lead lOld = leadOldMap.get(lNew.Id);
             if (lOld == null) continue;
-            
-            System.debug('Stary, konwersja: ' + lOld.IsConverted + ', Nowy, konwersja: ' + lNew.IsConverted + ', ContactID, nowy: ' + lNew.ConvertedContactId);
             
             // wykrycie konwersji
             if (!lOld.IsConverted && lNew.IsConverted && lNew.ConvertedContactId != null) {
@@ -66,6 +72,14 @@ public with sharing class LMS_LeadConvertSequence {
         }
     }
     
+    /**
+     * Obsługuje konwersję z leada na już istniejący kontakt.
+     *
+     * @param contactIdToCheck Mapa z Id kontaktu i statusem leada.
+     * @param contacts Lista kontaktów.
+     * @return void
+     */
+    
     private static void handleLeadConversionToExistingContact(Map<Id, String> contactIdToCheck, List<Contact> contacts) {
         System.debug('---LMS_LeadConvertSequence: handleLeadConversionToExistingContact---');
         List<String> activeStatusList = LMS_StatusManager.getActiveStatusList();
@@ -92,9 +106,6 @@ public with sharing class LMS_LeadConvertSequence {
             String fields = LMS_DatabaseQueryHelper.getCMFieldsToQuery();
             String whereClause;
             
-            System.debug('Contact Status: ' + contactStatus + ', Lead Status: ' + leadStatus);
-            System.debug('Contact Status index: ' + activeStatusList.indexOf(contactStatus) + ', Lead Status index: ' + activeStatusList.indexOf(leadStatus));
-            
             if(activeStatusList.indexOf(contactStatus) >= activeStatusList.indexOf(leadStatus)) {
                 // Status kontaktu jest równy lub wyższy niż status leada
                 whereClause = LMS_DatabaseQueryHelper.buildActiveCampaignMemberWhere(false, null, new Set<Id>{leadId});
@@ -118,6 +129,13 @@ public with sharing class LMS_LeadConvertSequence {
         if(activeCMs != null && activeCMs.size() > 0) update activeCMs;
     }
     
+    /**
+     * Kopiuje status Leada na Kontakt.
+     *
+     * @param contactsToUpdate Mapa z Kontaktem i statusem leada do ustawienia.
+     * @return void
+     */
+    
     private static void syncContactStatusFromLeadToContact(Map<Contact, String> contactsToUpdate) {
         System.debug('---LMS_LeadConvertSequence: syncContactStatusFromLeadToContact---');
         
@@ -128,11 +146,17 @@ public with sharing class LMS_LeadConvertSequence {
             contactsList.add(c);
         }
         
-        LMS_LeadContactSequence.setturnOffTriggers(true);
+        LMS_Utils.setTurnOffTriggers(true);
         update contactsList;
-        LMS_LeadContactSequence.setturnOffTriggers(false);
+        LMS_Utils.setTurnOffTriggers(false);
     }
     
+    /**
+     * Obsługuje tworzenie opportunity przy konwersji z leada na kontakt.
+     *
+     * @param opportunityToContactMap Mapa opportunity do kontaktu.
+     * @return void
+     */
     
     private static void handleLeadConversionToOpportunity(Map<Id, Id> opportunityToContactMap) {
         System.debug('---LMS_LeadConvertSequence: handleLeadConversionToOpportunity---');

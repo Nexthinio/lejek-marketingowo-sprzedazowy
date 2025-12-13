@@ -3,6 +3,10 @@ public with sharing class LMS_Configuration {
     private static Integer SCORETHRESHOLD;
     private static LMS_Configuration__mdt configuration = LMS_Configuration__mdt.getInstance('default');
     
+    /**
+     * Zwraca informację o tym, czy aplikacja powinna reagować na zmiany
+     * @return Boolean
+     */
     
     public static Boolean isApplicationEnabled() {
         /* Nigdy nie powinno się to zdarzyć biorąc pod uwagę, że te rekordy tworzone są podczas deploymentu, ale trzeba sprawdzić i obsłużyć nulla.
@@ -16,6 +20,11 @@ public with sharing class LMS_Configuration {
         return APPLICATIONENABLED;
     }
     
+    /**
+     * Zwraca informację o granicy punktowej, poniżej której CampaignMember nie zostanie zakwalifikowany
+     * @return Integer
+     */
+
     public static Integer getScoreThreshold() {
         if(configuration == null) {
             SCORETHRESHOLD = 100;

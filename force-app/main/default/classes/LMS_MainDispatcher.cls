@@ -10,7 +10,6 @@ public with sharing class LMS_MainDispatcher {
     
     public static void dispatch(Schema.sObjectType triggeringObject, LMS_TriggerCopy triggerCopy) {
         System.debug('---LMS_MainDispatcher: Entered---');
-        System.debug(triggeringObject);
 
         if(!LMS_Configuration.isApplicationEnabled()) {
             System.debug('---LMS_MainDispatcher: Application is disabled. Quitting.---');
