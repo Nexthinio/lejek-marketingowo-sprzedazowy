@@ -10,6 +10,7 @@ public with sharing class LMS_FunnelSequence {
     // };
     
     private static Map<String, String> FUNNELSTATUSLIST = new Map<String, String>();
+    private static List<String> FUNNELSEQUENCE;
     
     private static Map<Id, Contact> contactsById = new Map<Id, Contact>();
     private static Map<Id, Lead> leadsById = new Map<Id, Lead>();
@@ -105,6 +106,7 @@ public with sharing class LMS_FunnelSequence {
                 'SQO' => 'NEWOPPORTUNITY',
                 'Won' => 'OPPORTUNITYUPDATE.STAGE.Won'
             };
+            FUNNELSEQUENCE = new List<String>{'Inquiry', 'MQL', 'SAL', 'SQL', 'SQO', 'Won'};
             return;
         }
         
@@ -120,6 +122,7 @@ public with sharing class LMS_FunnelSequence {
                 }
                 criteria += '.' + rule.LMS_Field_API_Name__c + '.' + rule.LMS_Expected_Value__c;
             }
+            FUNNELSEQUENCE.add(rule.LMS_Funnel_Stage_Name__c);
             FUNNELSTATUSLIST.put(rule.LMS_Funnel_Stage_Name__c, criteria);
         }
     }
@@ -190,6 +193,8 @@ public with sharing class LMS_FunnelSequence {
                 }
             }
         }
+        
+        setResponseStatus(cm);
     }
     
     /**
@@ -254,10 +259,8 @@ public with sharing class LMS_FunnelSequence {
         cm.put(getFunnelFieldName(funnelStage), true);
         cm.put(getFunnelFieldDateName(funnelStage), Date.today());
         
-        setResponseStatus(cm);
-        
         // przejdź przez wszystkie inne stages
-        for (String stage : getFunnelStatusList().keySet()) {
+        for (String stage : FUNNELSEQUENCE) {
             if (stage == funnelStage) {
                 break;
             }

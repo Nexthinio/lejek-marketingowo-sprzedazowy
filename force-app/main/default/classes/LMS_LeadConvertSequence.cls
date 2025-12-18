@@ -182,8 +182,10 @@ public with sharing class LMS_LeadConvertSequence {
         }
         
         for(Opportunity o : opportunities) {
-            Id cmId = cmByParentId.get(opportunityToContactMap.get(o.Id)).Id;
-            o.LMS_FunnelContact__c = opportunityToContactMap.get(o.Id);
+            if(o.LMS_FunnelContact__c == null) {
+                Id cmId = cmByParentId.get(opportunityToContactMap.get(o.Id)).Id;
+                if(cmId != null) o.LMS_FunnelContact__c = opportunityToContactMap.get(o.Id);
+            }
         }
         update opportunities;
     }
