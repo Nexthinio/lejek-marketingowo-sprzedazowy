@@ -168,8 +168,6 @@ public with sharing class LMS_FunnelSequence {
         } else {
             l = (Lead) LMS_DatabaseQueryHelper.queryParent(cm);
         }
-
-        System.debug('Lead status: ' + l.Status);
         
         String contactStatusName = LMS_StatusManager.getContactStatusField();
         String leadStatusName = LMS_StatusManager.getLeadStatusField();
