@@ -157,7 +157,9 @@ public with sharing class LMS_CampaignMemberSequence {
         
         applyQualificationResults(qualified, parents);
         
+        LMS_Utils.setTurnOffTriggers(true);
         update parents.values();
+        LMS_Utils.setTurnOffTriggers(false);
     }
     
     /**
@@ -371,7 +373,6 @@ public with sharing class LMS_CampaignMemberSequence {
                     ((Lead)parent).Status =
                         LMS_StatusManager.getFirstActiveStatus();
                 }
-                LMS_FunnelSequence.setResponseStatus(cm, LMS_StatusManager.getFirstActiveStatus());
                 toUpdate.add(cm);
             }
             // Not at threshold
@@ -381,5 +382,8 @@ public with sharing class LMS_CampaignMemberSequence {
         }
         LMS_FunnelSequence.setMQL(toUpdate);
         LMS_FunnelSequence.startSequence(toUpdate);
+        for(CampaignMember cm : toUpdate) {
+            LMS_FunnelSequence.setResponseStatus(cm, LMS_StatusManager.getFirstActiveStatus());
+        }
     }
 }
