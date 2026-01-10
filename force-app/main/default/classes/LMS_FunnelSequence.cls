@@ -10,7 +10,7 @@ public with sharing class LMS_FunnelSequence {
     // };
     
     private static Map<String, String> FUNNELSTATUSLIST = new Map<String, String>();
-    private static List<String> FUNNELSEQUENCE;
+    private static List<String> FUNNELSEQUENCE = new List<String>();
     
     private static Map<Id, Contact> contactsById = new Map<Id, Contact>();
     private static Map<Id, Lead> leadsById = new Map<Id, Lead>();
